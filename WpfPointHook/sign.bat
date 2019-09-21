@@ -1,1 +1,1 @@
-signtool sign /v /f "wpfpointhook.pfx" /p 123456 "bin\debug\wpfpointhook.exe"
+signtool sign /v /f "hooktestspc.pfx" "bin\debug\wpfpointhook.exe"
