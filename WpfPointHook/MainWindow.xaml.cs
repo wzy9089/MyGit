@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -80,7 +81,10 @@ namespace WpfPointHook
             return IntPtr.Zero;
         }
 
-        StylusPointCollection pointCollection = new StylusPointCollection();
+        //StylusPointCollection pointCollection = new StylusPointCollection();
+        Stroke stroke;
+        List<Point> points;
+
         bool isDown = false;
         private void ProcessPenPoint(int msg, POINTER_PEN_INFO penInfo,uint x,uint y)
         {
@@ -90,23 +94,51 @@ namespace WpfPointHook
             StylusPoint sp = new StylusPoint(pt.X, pt.Y, pressure);
             switch(msg)
             {
+                case API.WM_POINTERENTER:
+                    if((penInfo.penFlags & PenFlags.ERASER)>0
+                        || (penInfo.penFlags & PenFlags.INVERTED)>0)
+                    {
+                        inkCanvas1.EditingMode = InkCanvasEditingMode.EraseByStroke;
+                    }
+                    else
+                    {
+                        inkCanvas1.EditingMode = InkCanvasEditingMode.Ink;
+                    }
+                    break;
                 case API.WM_POINTERDOWN:
                     isDown = true;
-                    pointCollection = new StylusPointCollection();
-                    pointCollection.Add(sp);
+                    if (inkCanvas1.EditingMode == InkCanvasEditingMode.Ink)
+                    {
+                        stroke = new Stroke(new StylusPointCollection(new StylusPoint[] { sp }), inkCanvas1.DefaultDrawingAttributes);
+                        inkCanvas1.Strokes.Add(stroke);
+                    }
+                    else if(inkCanvas1.EditingMode==InkCanvasEditingMode.EraseByStroke)
+                    {
+                        points = new List<Point>();
+                        points.Add(pt);
+                    }
                     break;
                 case API.WM_POINTERUPDATE:
                     if (isDown)
                     {
-                        pointCollection.Add(sp);
+                        if (inkCanvas1.EditingMode == InkCanvasEditingMode.Ink)
+                        {
+                            stroke.StylusPoints.Add(sp);
+                        }
+                        else if (inkCanvas1.EditingMode == InkCanvasEditingMode.EraseByStroke)
+                        {
+                            points.Add(pt);
+                            StrokeCollection sc = inkCanvas1.Strokes.HitTest(points, inkCanvas1.EraserShape);
+                            inkCanvas1.Strokes.Remove(sc);
+                        }
                     }
                     break;
                 case API.WM_POINTERUP:
                     isDown = false;
-                    pointCollection.Add(sp);
-                    Stroke stroke = new Stroke(pointCollection);
-                    stroke.DrawingAttributes = inkCanvas1.DefaultDrawingAttributes;
-                    inkCanvas1.Strokes.Add(stroke);
+                    if (inkCanvas1.EditingMode == InkCanvasEditingMode.Ink)
+                    {
+                        stroke.StylusPoints.Add(sp);
+                    }
                     break;
             }
         }
