@@ -27,13 +27,12 @@ namespace WpfPointHook
         public MainWindow()
         {
             InitializeComponent();           
+            this.inkCanvas1.DefaultDrawingAttributes.Color = Colors.Red;
         }
 
         IntPtr hwnd;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.inkCanvas1.DefaultDrawingAttributes.Color = Colors.Red;
-
             WindowInteropHelper helper = new WindowInteropHelper(this);
             hwnd = helper.Handle;
             HwndSource.FromHwnd(hwnd).AddHook(new HwndSourceHook(WndProc));
@@ -81,7 +80,6 @@ namespace WpfPointHook
             return IntPtr.Zero;
         }
 
-        //StylusPointCollection pointCollection = new StylusPointCollection();
         Stroke stroke;
         List<Point> points;
 
