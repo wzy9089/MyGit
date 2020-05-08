@@ -51,10 +51,11 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>0EF2B5B8456C2CCB8F524DAE59BA711BA6E2CA34</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>69490E2587CE4467F708AFF0135B9214ABCD9064</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>HookTestSPC.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
