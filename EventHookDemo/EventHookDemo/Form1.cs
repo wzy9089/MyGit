@@ -26,6 +26,8 @@ namespace EventHookDemo
 
         WINEVENTPROC _WinEventProc;
         HWINEVENTHOOK eventHookHandle;
+        HWND _LastHwnd;
+
         private void Form1_Load(object sender, EventArgs e)
         {
             eventHookHandle = PInvoke.SetWinEventHook(0, 0xff, HMODULE.Null, _WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
@@ -34,7 +36,7 @@ namespace EventHookDemo
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if(!eventHookHandle.IsNull)
+            if (!eventHookHandle.IsNull)
             {
                 PInvoke.UnhookWinEvent(eventHookHandle);
             }
@@ -42,15 +44,11 @@ namespace EventHookDemo
 
         internal unsafe void EventProc(Windows.Win32.UI.Accessibility.HWINEVENTHOOK hWinEventHook, uint @event, Windows.Win32.Foundation.HWND hwnd, int idObject, int idChild, uint idEventThread, uint dwmsEventTime)
         {
-            switch(@event)
+            switch (@event)
             {
                 case EVENT_SYSTEM_FOREGROUND:
                 case EVENT_SYSTEM_MOVESIZEEND:
-                    HWND hw = hwnd;
-                    if (hw.Value == this.Handle)
-                    {
-                        break;
-                    }
+                    _LastHwnd = hwnd;
                     WINDOWINFO info = new WINDOWINFO();
                     RECT rect;
                     char[] chars = new char[512];
@@ -58,10 +56,9 @@ namespace EventHookDemo
                     {
                         PWSTR str = new PWSTR(cstr);
 
-                        PInvoke.GetWindowInfo(hw, ref info);
-                        PInvoke.GetClientRect(hw, out rect);
-                        PInvoke.GetWindowText(hw, str, 256);
-                        
+                        PInvoke.GetWindowInfo(hwnd, ref info);
+                        PInvoke.GetClientRect(hwnd, out rect);
+                        PInvoke.GetWindowText(hwnd, str, 256);
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine(string.Format("Caption:{0}", str));
                         sb.AppendLine(string.Format("WindowRect:X={0},Y={1},Width={2},Height={3}", info.rcWindow.X, info.rcWindow.Y, info.rcWindow.Width, info.rcWindow.Height));
@@ -76,5 +73,15 @@ namespace EventHookDemo
             }
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if(_LastHwnd.IsNull)
+            {
+                return;
+            }
+
+            PInvoke.SetWindowPos(_LastHwnd, HWND.Null, 0, 0, 400, 400, SET_WINDOW_POS_FLAGS.SWP_NOZORDER);
+            PInvoke.SetForegroundWindow(_LastHwnd);
+        }
     }
 }
