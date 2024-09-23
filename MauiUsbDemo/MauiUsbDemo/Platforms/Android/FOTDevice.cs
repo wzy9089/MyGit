@@ -18,20 +18,19 @@ namespace MauiUsbDemo
 {
     public partial class FOTDevice
     {
-
-        private Android.Hardware.Usb.UsbDevice? _FOTUsbDevice;
-        private UsbDeviceConnection? _FOTUsbConnection;
-        private UsbInterface? _FOTBulkInterface;
-        private Thread? _BulkReadThread;
-        private bool _StopThread = false;
-        private bool _Connected;
-        public bool Connected { get => _Connected; private set => _Connected = value; }
-
-        internal static readonly string ACTION_USB_PERMISSION = "KOGATOUCH.FlatOpticalTouch.usb.device";
+        internal static readonly string ACTION_USB_PERMISSION = "KOGATOUCH.FOTDevice.USB_PERMISSION";
         private static FOTUsbActionReciver UsbActionReceiver = new FOTUsbActionReciver();
         private static bool _Inited = false;
         private static Android.App.Activity? _Activity;
         private static UsbManager? _UsbManager;
+        private static UsbDevice? _UsbDevice;
+        private static UsbInterface? _UsbBulkInterface;
+        private static UsbDeviceConnection? _UsbDeviceConnection;
+        private static Thread? _BulkReadThread;
+        private static bool _StopBulkReadThread = true;
+
+        private static bool _IsConnected;
+        public static bool IsConnected { get => _IsConnected; private set => _IsConnected = value; }
 
         public static partial bool Init()
         {
@@ -64,7 +63,7 @@ namespace MauiUsbDemo
             {
                 if (_UsbManager.HasPermission(device))
                 {
-                    System.Diagnostics.Debug.WriteLine($"HasPermission:{device.ToString()}");
+                    ConnectToDevice(device);
                 }
                 else
                 {
@@ -78,7 +77,162 @@ namespace MauiUsbDemo
 
 
         public static partial void Uninit()
-        { }
+        {
+            if( !_Inited)
+            { return; }
+
+            DisconnectToDevice();
+
+            UnregisterBoardcast();
+
+            _UsbManager = null;
+            _Activity = null;
+
+            _Inited = false;
+        }
+
+        private const int ReadBuffLength = 16384;
+        private static void BulkReadProc()
+        {
+            _StopBulkReadThread = false;
+
+            if (_UsbDeviceConnection.ClaimInterface(_UsbBulkInterface, true))
+            {
+                byte[] buffer = new byte[ReadBuffLength];
+                MemoryStream ms = new MemoryStream();
+
+                while (!_StopBulkReadThread)
+                {
+                    int readCnt = _UsbDeviceConnection.BulkTransfer(_UsbBulkInterface.GetEndpoint(0), buffer, ReadBuffLength, 10);
+                    if (readCnt < 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Read error {readCnt}");
+                    }
+                    else
+                    {
+                        //System.Diagnostics.Debug.WriteLine($"Read {cnt++},{readCnt}");
+                        ms.Write(buffer, 0, readCnt);
+
+                        if (readCnt < ReadBuffLength)
+                        {
+                            if (ms.Length == FOT_Bulk_RawImage_Packet.FOT_BULK_RAWIMAGE_PACKET_SIZE)
+                            {
+                                ms.Seek(0, SeekOrigin.Begin);
+                                using (BinaryReader br = new BinaryReader(ms))
+                                {
+                                    FOT_Bulk_RawImage_Head head = new FOT_Bulk_RawImage_Head();
+                                    head.Prefix = br.ReadUInt32();
+                                    head.Length = br.ReadUInt32();
+
+                                    if (head.IsValidHead())
+                                    {
+                                        FOT_Bulk_RawImage rawImg = new FOT_Bulk_RawImage();
+                                        br.Read(rawImg.Image0);
+                                        br.Read(rawImg.Image1);
+
+                                        OnRawImageReceived(new RawImageReceivedEventArgs(rawImg));
+                                    }
+                                }
+
+                                ms = new MemoryStream();
+                            }
+                            else
+                            {
+                                ms.Close();
+                                ms.Dispose();
+                                ms = new MemoryStream();
+                            }
+                        }
+
+                        if (ms.Length > FOT_Bulk_RawImage_Packet.FOT_BULK_RAWIMAGE_PACKET_SIZE)
+                        {
+                            ms.Close();
+                            ms.Dispose();
+                            ms = new MemoryStream();
+                        }
+                    }
+                }
+
+                try
+                {
+                    ms.Close();
+                    ms.Dispose();
+                }
+                catch { }
+            }
+
+            _UsbDeviceConnection.ReleaseInterface(_UsbBulkInterface);
+            _StopBulkReadThread = true;
+        }
+
+        private static void ConnectToDevice(UsbDevice usbDevice)
+        {
+            lock (_Activity)
+            {
+                if (!IsConnected)
+                {
+                    UsbDeviceConnection? udc = _UsbManager.OpenDevice(usbDevice);
+                    if(udc ==  null)
+                    {
+                        return;
+                    }
+
+                    _UsbDeviceConnection = udc;
+                    _UsbBulkInterface = usbDevice.GetInterface(0);
+                    _UsbDevice = usbDevice;
+                    
+                    _BulkReadThread = new Thread(new ThreadStart(BulkReadProc));
+                    _BulkReadThread.IsBackground = true;
+                    _BulkReadThread.Start();
+                    while (!_BulkReadThread.IsAlive) { }
+
+                    IsConnected = true;
+
+                    OnConnected();
+                }
+            }
+        }
+
+        private static void OnConnected()
+        {
+            if(Connected!=null)
+            {
+                Connected(null, EventArgs.Empty);
+            }
+        }
+
+        private static void DisconnectToDevice()
+        {
+            lock (_Activity)
+            {
+                if (IsConnected)
+                {
+                    IsConnected = false;
+                    _StopBulkReadThread = true;
+
+                    _BulkReadThread?.Join();
+
+                    _UsbDeviceConnection?.Dispose();
+                    _UsbBulkInterface?.Dispose();
+                    _UsbDevice?.Dispose();
+
+                    _UsbBulkInterface = null;
+                    _UsbDeviceConnection = null;
+                    _UsbDevice = null;
+                    _BulkReadThread = null;
+
+                    OnDisconnected();
+                }
+            }
+        }
+
+        private static void OnDisconnected()
+        {
+            if (Disconnected != null)
+            {
+                Disconnected(null, EventArgs.Empty);
+            }
+        }
 
         private static Android.Hardware.Usb.UsbDevice? FindFOTUsbDevice()
         {
@@ -96,18 +250,35 @@ namespace MauiUsbDemo
 
         private static bool RequestPermission(UsbDevice device)
         {
-            if (_Activity == null || _UsbManager == null)
+            var act = Platform.CurrentActivity;
+            if (act != null)
             {
-                return false;
+                UsbManager? um = (UsbManager?)act.GetSystemService(Android.Content.Context.UsbService);
+
+                if (um != null)
+                {
+
+                    PendingIntent? mPermissionIntent;
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.S)
+                    {
+                        mPermissionIntent = PendingIntent.GetBroadcast(_Activity, 0, new Intent(ACTION_USB_PERMISSION), PendingIntentFlags.Mutable);
+                    }
+                    else
+                    {
+                        mPermissionIntent = PendingIntent.GetBroadcast(_Activity, 0, new Intent(ACTION_USB_PERMISSION), PendingIntentFlags.Immutable);
+                    }
+
+                    um.RequestPermission(device, mPermissionIntent);
+
+                    return true;
+                }
             }
 
-            PendingIntent? mPermissionIntent = PendingIntent.GetBroadcast(_Activity, 0, new Intent(ACTION_USB_PERMISSION), PendingIntentFlags.Immutable);
-            _UsbManager.RequestPermission(device, mPermissionIntent);
-
-            return true;
+            return false;
         }
 
-        private static bool RegisterBoardcast()
+        internal static bool RegisterBoardcast()
         {
             if (_Activity == null)
                 return false;
@@ -128,200 +299,80 @@ namespace MauiUsbDemo
             }
         }
 
-        private FOTDevice(UsbDevice device)
+        private class FOTUsbActionReciver : BroadcastReceiver
         {
-            System.Diagnostics.Debug.Assert(device != null);
-
-            _FOTUsbDevice = device;
-
-            UsbDeviceConnection? udc = _UsbManager?.OpenDevice(device);
-            if (udc != null)
+            public override void OnReceive(Context? context, Intent? intent)
             {
-                _FOTUsbConnection = udc;
-                _FOTBulkInterface = _FOTUsbDevice.GetInterface(0);
-                _BulkReadThread = new Thread(new ThreadStart(BulkReadProc));
-                _BulkReadThread.Start();
-                while (!_BulkReadThread.IsAlive) { }
-                Connected = true;
-            }
-        }
-
-
-        
-        public bool Connect()
-        {
-            if (Connected)
-                return true;
-
-            Android.Hardware.Usb.UsbDevice? usbDevice = FindFOTUsbDevice();
-            if (usbDevice != null)
-            {
-                Android.App.Activity? act = Platform.CurrentActivity;
-                if (act != null)
+                if (intent != null)
                 {
-                    UsbManager? um = (UsbManager?)act.GetSystemService(Android.Content.Context.UsbService);
-                    if (um != null && um.DeviceList != null)
+                    string? action = intent.Action;
+                    Android.Hardware.Usb.UsbDevice? device;
+
+                    if (action != null)
                     {
-                        PendingIntent? mPermissionIntent = PendingIntent.GetBroadcast(act, 0, new Intent(ACTION_USB_PERMISSION), PendingIntentFlags.Mutable);
-                        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-
-                        if (!um.HasPermission(usbDevice))
+                        System.Diagnostics.Debug.WriteLine(action);
+                        if (UsbManager.ActionUsbDeviceAttached.Equals(action))
                         {
-                            um.RequestPermission(usbDevice, mPermissionIntent);
-                        }
-                        else
-                        {
-                            UsbDeviceConnection? udc = um.OpenDevice(usbDevice);
-                            if (udc != null)
+                            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
                             {
-                                _FOTUsbDevice = usbDevice;
-                                _FOTUsbConnection = udc;
-                                _FOTBulkInterface = usbDevice.GetInterface(0);
-                                _BulkReadThread = new Thread(new ThreadStart(BulkReadProc));
-                                //_BulkReadThread.IsBackground = true;
-                                _BulkReadThread.Start();
-                                while (!_BulkReadThread.IsAlive) { }
-                                Connected = true;
+                                device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice, Java.Lang.Class.FromType(typeof(Android.Hardware.Usb.UsbDevice)));
+                            }
+                            else
+                            {
+                                device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
+                            }
 
-                                return true;
+                            if (device != null)
+                            {
+                                if (device.VendorId == FOTDevice.VENDOR_ID && device.ProductId == FOTDevice.PRODUCT_ID)
+                                {
+                                    UsbManager? um = (UsbManager?)context?.GetSystemService(Android.Content.Context.UsbService);
+                                    if (!um.HasPermission(device))
+                                    {
+                                        RequestPermission(device);
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            }
 
-            return false;
-        }
-
-        private const int ReadBuffLength = 16384;
-        private void BulkReadProc()
-        {
-            _StopThread = false;
-
-            if(_FOTUsbConnection.ClaimInterface(_FOTBulkInterface,true))
-            {
-                byte[] buffer = new byte[ReadBuffLength];
-                MemoryStream ms = new MemoryStream();
-
-                int cnt = 0;
-                while (!_StopThread)
-                {
-                    int readCnt = _FOTUsbConnection.BulkTransfer(_FOTBulkInterface.GetEndpoint(0), buffer, ReadBuffLength, 10);
-                    if (readCnt < 0)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Read error {readCnt}");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Read {cnt++},{readCnt}");
-                        //if (ms.Position == 0)
-                        //{
-                        //    IntPtr headPtr = Marshal.AllocHGlobal(Marshal.SizeOf<FOT_Bulk_RawImage_Head>());
-                        //    Marshal.Copy(buffer, 0, headPtr, Marshal.SizeOf<FOT_Bulk_RawImage_Head>());
-                        //    FOT_Bulk_RawImage_Head head = Marshal.PtrToStructure<FOT_Bulk_RawImage_Head>(headPtr);
-                        //    if (head.IsValidHead())
-                        //    {
-                        //        ms.Write(buffer, 0, readCnt);
-                        //    }
-                        //    else
-                        //    {
-                        //        continue;
-                        //    }
-                        //}
-                        //else if (ms.Length<FOT_Bulk_RawImage_Packet.FOT_BULK_RAWIMAGE_PACKET_SIZE)
-                        //{
-                        //    ms.Write(buffer,0,readCnt);
-                        //    if(ms.Length==FOT_Bulk_RawImage_Packet.FOT_BULK_RAWIMAGE_PACKET_SIZE)
-                        //    {
-                        //        byte[] dataBuffer = ms.GetBuffer();
-                        //        FOT_Bulk_RawImage rawImage = new FOT_Bulk_RawImage();
-                        //        int headSize = Marshal.SizeOf<FOT_Bulk_RawImage_Head>();
-                        //        Array.Copy(dataBuffer, headSize, rawImage.Image0, 0, rawImage.Image0.Length);
-                        //        Array.Copy(dataBuffer, headSize + rawImage.Image0.Length, rawImage.Image1, 0, rawImage.Image1.Length);
-
-                        //        Debug.WriteLine("Raw image data received.");
-
-                        //        ms.Position = 0;
-                        //    }
-                        //}
-                    }
-                }
-
-                ms.Close();
-            }
-
-            _StopThread = true;
-        }
-
-        public void Disconnect()
-        {
-            if(!Connected) return;
-
-            _StopThread = true;
-            _BulkReadThread?.Join();
-            _FOTUsbConnection?.ReleaseInterface(_FOTBulkInterface);
-            _FOTUsbConnection?.Close();
-            _FOTUsbConnection?.Dispose();
-            _FOTBulkInterface?.Dispose();
-            _FOTUsbDevice?.Dispose();
-            _FOTUsbDevice = null;
-            _FOTBulkInterface = null;
-            _FOTUsbConnection = null;
-            _BulkReadThread = null;
-
-            Connected = false;
-        }
-    }
-
-    internal class FOTUsbActionReciver : BroadcastReceiver
-    {
-        public override void OnReceive(Context? context, Intent? intent)
-        {
-            if (intent != null)
-            {
-                string? action = intent.Action;
-                Android.Hardware.Usb.UsbDevice? device;
-
-                if (action != null)
-                {
-                    System.Diagnostics.Debug.WriteLine(action);
-                    if(UsbManager.ActionUsbDeviceAttached.Equals(action))
-                    {
-                        if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
+                        if(UsbManager.ActionUsbDeviceDetached.Equals(action))
                         {
-                            device = intent.GetParcelableExtra(UsbManager.ExtraDevice, Java.Lang.Class.FromType(typeof(Android.Hardware.Usb.UsbDevice))) as Android.Hardware.Usb.UsbDevice;
-                        }
-                        else 
-                        {
-                            device = intent.GetParcelableExtra(UsbManager.ExtraDevice) as Android.Hardware.Usb.UsbDevice;
-                        }
-
-                        if (device != null)
-                        {
-                            if (device.VendorId == FOTDevice.VENDOR_ID && device.ProductId == FOTDevice.PRODUCT_ID)
+                            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
                             {
-                                UsbManager? um = (UsbManager?)context?.GetSystemService(Android.Content.Context.UsbService);
-                                if (!um.HasPermission(device))
+                                device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice, Java.Lang.Class.FromType(typeof(Android.Hardware.Usb.UsbDevice)));
+                            }
+                            else
+                            {
+                                device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
+                            }
+
+                            if (device != null && IsConnected)
+                            {
+                                if (device.Equals(_UsbDevice))
                                 {
-                                    um.RequestPermission(device, PendingIntent.GetBroadcast(context, 0, new Intent(FOTDevice.ACTION_USB_PERMISSION), PendingIntentFlags.Immutable));
+                                    DisconnectToDevice();
+                                }
+                            }
+                        }
+
+                        if (FOTDevice.ACTION_USB_PERMISSION.Equals(action))
+                        {
+                            lock (this)
+                            {
+                                device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
+                                if (intent.GetBooleanExtra(UsbManager.ExtraPermissionGranted, false))
+                                {
+                                    if (device != null)
+                                    {
+                                        ConnectToDevice(device);
+                                    }
                                 }
                             }
                         }
                     }
-
-                    if(FOTDevice.ACTION_USB_PERMISSION.Equals(action))
-                    {
-                        device = (UsbDevice)intent.GetParcelableExtra(UsbManager.ExtraDevice);
-                        if (intent.GetBooleanExtra(UsbManager.ExtraPermissionGranted, false))
-                        {
-                            if (device != null)
-                            {
-                                System.Diagnostics.Debug.WriteLine($"Granted:{device.ToString()}");
-                            }
-                        }
-                    }
                 }
             }
         }
     }
+
 }

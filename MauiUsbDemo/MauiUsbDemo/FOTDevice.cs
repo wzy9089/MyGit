@@ -12,13 +12,15 @@ namespace MauiUsbDemo
         internal const int VENDOR_ID = 0x2621;
         internal const int PRODUCT_ID = 0x5001;
 
-        public event EventHandler<RawImageReceivedEventArgs>? RawImageReceived;
+        public static event EventHandler<RawImageReceivedEventArgs>? RawImageReceived;
+        public static event EventHandler? Connected;
+        public static event EventHandler? Disconnected;
 
-        protected void OnRawImageReceived(RawImageReceivedEventArgs e)
+        private static void OnRawImageReceived(RawImageReceivedEventArgs e)
         {
             if (RawImageReceived != null)
             {
-                RawImageReceived(this, e);
+                RawImageReceived(null, e);
             }
         }
 
