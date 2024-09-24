@@ -14,7 +14,8 @@
                 HeightRequest="185"
                 Aspect="AspectFit"
                 SemanticProperties.Description="dot net bot in a race car number eight" />
-            <skia:SKCanvasView WidthRequest="1080" HeightRequest="54" />
+            <skia:SKCanvasView x:Name="skImg0" HorizontalOptions="Center"  MinimumWidthRequest="1080" MinimumHeightRequest="54" PaintSurface="skImg0_PaintSurface" />
+            <skia:SKCanvasView x:Name="skImg1"  MinimumWidthRequest="1080" MinimumHeightRequest="54" PaintSurface="skImg1_PaintSurface" />
             <Label
                 Text="Hello, World!"
                 Style="{StaticResource Headline}"
