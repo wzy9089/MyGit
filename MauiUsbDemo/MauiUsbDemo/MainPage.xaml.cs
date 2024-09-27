@@ -1,14 +1,15 @@
 ﻿using SkiaSharp;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using KOGA.FOT.MAUI;
 
 namespace MauiUsbDemo
 {
     public partial class MainPage : ContentPage
     {
         int count = 0;
-        SKBitmap skBmp0;
-        SKBitmap skBmp1;
+        SKBitmap? skBmp0;
+        SKBitmap? skBmp1;
 
         //FOTDevice _fotDevice;
         public MainPage()

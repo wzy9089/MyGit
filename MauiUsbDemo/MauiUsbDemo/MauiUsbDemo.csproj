@@ -58,12 +58,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.91" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.91" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Maui.Graphics.Skia" Version="8.0.90" />
+		<PackageReference Include="Microsoft.Maui.Graphics.Skia" Version="8.0.91" />
 		<PackageReference Include="SkiaSharp" Version="2.88.8" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\FOT.MAUI\KOGA.FOT.MAUI.csproj" />
 	</ItemGroup>
 
 </Project>
