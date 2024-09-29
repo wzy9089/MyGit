@@ -9,7 +9,7 @@ namespace MauiUsbDemo
     {
         int count = 0;
         SKBitmap? skBmp0;
-        SKBitmap? skBmp1;
+        //SKBitmap? skBmp1;
 
         //FOTDevice _fotDevice;
         public MainPage()
@@ -25,25 +25,11 @@ namespace MauiUsbDemo
         {
             Debug.WriteLine($"FOTDevice_RawImageReceived:{DateTime.Now.Ticks}");
             MainThread.BeginInvokeOnMainThread(() => {
-                skBmp0 = CreateSKBitmap(e.RawImage.Image0);
-                skBmp1 = CreateSKBitmap(e.RawImage.Image1);
-                skImg0.InvalidateSurface();
-                skImg1.InvalidateSurface();
+                fotImg0.RawImage = RawDataHelper.CreateSKBitmapFromRawImageData(1080, 54, e.RawImage.Image0);
+                fotImg1.RawImage = RawDataHelper.CreateSKBitmapFromRawImageData(1080, 54, e.RawImage.Image1);
             });
         }
 
-        private SKBitmap CreateSKBitmap(byte[] data)
-        {
-            if (data == null || data.Length != 1080 * 54)
-                return null;
-
-            SKBitmap bmp=new SKBitmap(1080,54,SKColorType.Gray8,SKAlphaType.Opaque);
-
-            nint bmpPtr = bmp.GetPixels();
-            Marshal.Copy(data, 0, bmpPtr, data.Length);
-
-            return bmp;
-        }
         private void FOTDevice_Disconnected(object? sender, EventArgs e)
         {
             Debug.WriteLine("FOTDevice_Disconnected");
@@ -71,41 +57,6 @@ namespace MauiUsbDemo
         private void ContentPage_Unloaded(object sender, EventArgs e)
         {
             FOTDevice.Uninit();
-        }
-
-        private void SKCanvasView_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
-        {
-
-        }
-
-        private void skImg0_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
-        {
-            SKCanvas canvas = e.Surface.Canvas;
-            if (skBmp0 == null)
-            {
-                canvas.Clear();
-                return;
-            }
-            else
-            {
-                SKBitmap bmp = skBmp0.Resize(e.Info.Size, SKFilterQuality.Medium);
-                canvas.DrawBitmap(bmp, 0, 0);
-            }
-        }
-
-        private void skImg1_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
-        {
-            SKCanvas canvas = e.Surface.Canvas;
-            if (skBmp1 == null)
-            {
-                canvas.Clear();
-                return;
-            }
-            else
-            {
-                SKBitmap bmp = skBmp1.Resize(e.Info.Size, SKFilterQuality.Medium);
-                canvas.DrawBitmap(bmp, 0, 0);
-            }
         }
     }
 

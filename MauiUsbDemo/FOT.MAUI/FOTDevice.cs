@@ -34,6 +34,10 @@ namespace KOGA.FOT.MAUI
         public static partial bool Init();
 
         public static partial void Uninit();
+
+        public static partial int GetFeature(byte reportId, byte[] data, int length, int timeout);
+
+        public static partial int SetFeature(byte reportId, byte[] data, int length, int timeout);
     }
 
     [StructLayout(LayoutKind.Sequential,Pack =1)]

@@ -90,6 +90,34 @@ namespace KOGA.FOT.MAUI
             _Inited = false;
         }
 
+        public static partial int SetFeature(byte reportId, byte[] data,int length, int timeout)
+        {
+            System.Diagnostics.Debug.Assert(data != null);
+
+            int requestValue = (0x0300 | reportId);
+            int requestType = 0x21;
+            int request = 0x09;
+
+            if (_UsbDeviceConnection != null)
+                return _UsbDeviceConnection.ControlTransfer((UsbAddressing)requestType, request, requestValue, 1, data, length, timeout);
+
+            return -1;
+        }
+
+        public static partial int GetFeature(byte reportId, byte[] data, int length, int timeout)
+        {
+            System.Diagnostics.Debug.Assert(data != null);
+
+            int requestValue = (0x0300 | reportId);
+            int requestType = 0xA1;
+            int request = 0x01;
+
+            if (_UsbDeviceConnection != null)
+                return _UsbDeviceConnection.ControlTransfer((UsbAddressing)requestType, request, requestValue, 1, data, length, timeout);
+
+            return -1;
+        }
+
         private const int BulkReadBuffLength = 16384;
         private static void BulkReadProc()
         {

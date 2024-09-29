@@ -16,5 +16,10 @@ namespace KOGA.FOT.MAUI
 
         public static partial void Uninit() { }
 
+        public static partial int GetFeature(byte reportId, byte[] data, int length, int timeout)
+        { return -1; }
+
+        public static partial int SetFeature(byte reportId, byte[] data, int length, int timeout)
+        { return -1; }
     }
 }
