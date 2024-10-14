@@ -11,6 +11,7 @@ namespace KOGA.FOT.MAUI
     {
         internal const int VENDOR_ID = 0x2621;
         internal const int PRODUCT_ID = 0x5001;
+        internal const string WINUSB_GUID = "{661db43b-90fe-45b1-a815-2e32bd85e0b3}";
 
         public static event EventHandler<RawImageReceivedEventArgs>? RawImageReceived;
         public static event EventHandler? Connected;

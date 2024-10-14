@@ -38,11 +38,12 @@ namespace KOGA.FOT.MAUI
             }
             else
             {
-                SKBitmap bmp = RawImage.Resize(e.Info.Size, SKFilterQuality.Medium);
-                canvas.DrawBitmap(bmp, 0, 0);
+                //canvas.DrawPoints(SKPointMode.)
+                //SKBitmap bmp = RawImage.Resize(e.Info.Size, SKFilterQuality.Medium);
+                canvas.DrawBitmap(RawImage, e.Info.Rect);
             }
 
-            base.OnPaintSurface(e);
+            //base.OnPaintSurface(e);
         }
     }
 }

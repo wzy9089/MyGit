@@ -23,7 +23,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.91" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.91" />
 		<PackageReference Include="Microsoft.Maui.Graphics.Skia" Version="8.0.91" />
-		<PackageReference Include="Nefarius.Drivers.WinUSB" Version="5.0.0" />
+		<PackageReference Include="Nefarius.Utilities.DeviceManagement" Version="4.0.1" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
 	</ItemGroup>
 

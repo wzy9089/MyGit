@@ -19,13 +19,15 @@ namespace KOGA.FOT.MAUI
     public partial class FOTDevice
     {
         internal static readonly string ACTION_USB_PERMISSION = "KOGATOUCH.FOTDevice.USB_PERMISSION";
-        private static FOTUsbActionReciver UsbActionReceiver = new FOTUsbActionReciver();
+        private static FOTUsbActionReciver _UsbActionReceiver = new FOTUsbActionReciver();
         private static bool _Inited = false;
         private static Android.App.Activity? _Activity;
         private static UsbManager? _UsbManager;
         private static UsbDevice? _UsbDevice;
         private static UsbInterface? _UsbBulkInterface;
-        private static UsbDeviceConnection? _UsbDeviceConnection;
+        private static UsbInterface? _UsbFeatureInterface;
+        private static UsbDeviceConnection? _UsbBulkConnection;
+        private static UsbDeviceConnection? _UsbFeatureConnection;
         private static Thread? _BulkReadThread;
         private static bool _StopBulkReadThread = true;
 
@@ -98,8 +100,8 @@ namespace KOGA.FOT.MAUI
             int requestType = 0x21;
             int request = 0x09;
 
-            if (_UsbDeviceConnection != null)
-                return _UsbDeviceConnection.ControlTransfer((UsbAddressing)requestType, request, requestValue, 1, data, length, timeout);
+            if (_UsbFeatureConnection != null)
+                return _UsbFeatureConnection.ControlTransfer((UsbAddressing)requestType, request, requestValue, 2, data, length, timeout);
 
             return -1;
         }
@@ -112,8 +114,8 @@ namespace KOGA.FOT.MAUI
             int requestType = 0xA1;
             int request = 0x01;
 
-            if (_UsbDeviceConnection != null)
-                return _UsbDeviceConnection.ControlTransfer((UsbAddressing)requestType, request, requestValue, 1, data, length, timeout);
+            if (_UsbFeatureConnection != null)
+                return _UsbFeatureConnection.ControlTransfer((UsbAddressing)requestType, request, requestValue, 2, data, length, timeout);
 
             return -1;
         }
@@ -123,14 +125,14 @@ namespace KOGA.FOT.MAUI
         {
             _StopBulkReadThread = false;
 
-            if (_UsbDeviceConnection.ClaimInterface(_UsbBulkInterface, true))
+            if (_UsbBulkConnection.ClaimInterface(_UsbBulkInterface, true))
             {
                 byte[] buffer = new byte[BulkReadBuffLength];
                 MemoryStream ms = new MemoryStream();
 
                 while (!_StopBulkReadThread)
                 {
-                    int readCnt = _UsbDeviceConnection.BulkTransfer(_UsbBulkInterface.GetEndpoint(0), buffer, BulkReadBuffLength, 10);
+                    int readCnt = _UsbBulkConnection.BulkTransfer(_UsbBulkInterface.GetEndpoint(0), buffer, BulkReadBuffLength, 10);
                     if (readCnt < 0)
                     {
                         System.Diagnostics.Debug.WriteLine($"Read error {readCnt}");
@@ -186,9 +188,10 @@ namespace KOGA.FOT.MAUI
                     ms.Dispose();
                 }
                 catch { }
+
+                _UsbBulkConnection.ReleaseInterface(_UsbBulkInterface);
             }
 
-            _UsbDeviceConnection.ReleaseInterface(_UsbBulkInterface);
             _StopBulkReadThread = true;
         }
 
@@ -206,9 +209,21 @@ namespace KOGA.FOT.MAUI
                     {
                         return;
                     }
+                    
+                    UsbDeviceConnection? udcf = _UsbManager.OpenDevice(usbDevice);
+                    if(udcf == null)
+                    {
+                        udc.Close();
+                        return;
+                    }
 
-                    _UsbDeviceConnection = udc;
+                    _UsbBulkConnection = udc;
                     _UsbBulkInterface = usbDevice.GetInterface(0);
+
+                    _UsbFeatureConnection = udcf;
+                    _UsbFeatureInterface = usbDevice.GetInterface(2);
+                    _UsbFeatureConnection.ClaimInterface(_UsbFeatureInterface, true);
+
                     _UsbDevice = usbDevice;
                     
                     _BulkReadThread = new Thread(new ThreadStart(BulkReadProc));
@@ -237,12 +252,23 @@ namespace KOGA.FOT.MAUI
 
                     _BulkReadThread?.Join();
 
-                    _UsbDeviceConnection?.Dispose();
+                    _UsbBulkConnection?.Close();
+                    _UsbBulkConnection?.Dispose();
                     _UsbBulkInterface?.Dispose();
+
+                    _UsbFeatureConnection?.ReleaseInterface(_UsbFeatureInterface);
+                    _UsbFeatureConnection?.Close();
+                    _UsbFeatureConnection?.Dispose();
+                    _UsbFeatureInterface?.Dispose();
+
                     _UsbDevice?.Dispose();
 
                     _UsbBulkInterface = null;
-                    _UsbDeviceConnection = null;
+                    _UsbBulkConnection = null;
+
+                    _UsbFeatureInterface = null;
+                    _UsbFeatureConnection = null;
+
                     _UsbDevice = null;
                     _BulkReadThread = null;
 
@@ -303,14 +329,14 @@ namespace KOGA.FOT.MAUI
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
             filter.AddAction(UsbManager.ActionUsbDeviceDetached);
             filter.AddAction(UsbManager.ActionUsbDeviceAttached);
-            _Activity.RegisterReceiver(UsbActionReceiver, filter);
+            _Activity.RegisterReceiver(_UsbActionReceiver, filter);
 
             return true;
         }
 
         private static void UnregisterBoardcast()
         {
-            _Activity?.UnregisterReceiver(UsbActionReceiver);
+            _Activity?.UnregisterReceiver(_UsbActionReceiver);
         }
 
         private class FOTUsbActionReciver : BroadcastReceiver
