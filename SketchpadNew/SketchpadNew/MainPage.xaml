@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             x:Class="SketchpadNew.MainPage">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <skia:SKCanvasView x:Name="paintView" PaintSurface="paintView_PaintSurface"/>
+        <skia:SKCanvasView x:Name="canvasView" PaintSurface="canvasView_PaintSurface" >
+            <skia:SKCanvasView.GestureRecognizers>
+                <PointerGestureRecognizer PointerEntered="PointerGestureRecognizer_PointerEntered"
+                                          PointerMoved="PointerGestureRecognizer_PointerMoved"
+                                          PointerExited="PointerGestureRecognizer_PointerExited"/>
+            </skia:SKCanvasView.GestureRecognizers>
+
+            <FlyoutBase.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="Clear" Clicked="OnClear" />
+                    <MenuFlyoutItem Text="Exit"  Clicked="OnExit" />
+                </MenuFlyout>
+            </FlyoutBase.ContextFlyout>
+
+        </skia:SKCanvasView>
+
+    </Grid>
+
+</ContentPage>
