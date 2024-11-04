@@ -1,6 +1,8 @@
-﻿using Microsoft.UI.Windowing;
+﻿#if WINDOWS
+using Microsoft.UI.Windowing;
 using Microsoft.UI;
 using WinRT.Interop;
+#endif
 
 namespace SketchpadNew
 {
@@ -20,7 +22,7 @@ namespace SketchpadNew
             window.MinimumWidth = 0;
             window.MinimumHeight = 0;
 
-
+#if WINDOWS
             //设置全屏和隐藏拖动条
             window.Created += (s, e) =>
             {
@@ -45,6 +47,7 @@ namespace SketchpadNew
                     }
                 }
             };
+#endif
 
             return window;
         }
