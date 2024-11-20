@@ -7,11 +7,6 @@ namespace MauiUsbDemo
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
-        SKBitmap? skBmp0;
-        //SKBitmap? skBmp1;
-
-        //FOTDevice _fotDevice;
         public MainPage()
         {
             InitializeComponent();
@@ -53,8 +48,18 @@ namespace MauiUsbDemo
             Debug.WriteLine("FOTDevice_Connected");
         }
 
-        MemoryStream ms = new MemoryStream();
-        private void OnCounterClicked(object sender, EventArgs e)
+
+        private void ContentPage_Loaded(object sender, EventArgs e)
+        {
+            FOTDevice.Init();
+        }
+
+        private void ContentPage_Unloaded(object sender, EventArgs e)
+        {
+            FOTDevice.Uninit();
+        }
+
+        private void CounterBtn_Clicked(object sender, EventArgs e)
         {
             byte[] cmdData = new byte[]
             {
@@ -68,21 +73,6 @@ namespace MauiUsbDemo
             Thread.Sleep(10);
             ret = FOTDevice.GetFeature(0x18, cmdData, cmdData.Length, 10);
             Debug.WriteLine($"GetFeature retuen {ret}");
-
-        }
-
-        private void DisconnectBtn_Clicked(object sender, EventArgs e)
-        {
-        }
-
-        private void ContentPage_Loaded(object sender, EventArgs e)
-        {
-            FOTDevice.Init();
-        }
-
-        private void ContentPage_Unloaded(object sender, EventArgs e)
-        {
-            FOTDevice.Uninit();
         }
     }
 

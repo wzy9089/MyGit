@@ -33,17 +33,13 @@ namespace KOGA.FOT.MAUI
             SKCanvas canvas = e.Surface.Canvas;
             if (RawImage == null)
             {
-                canvas.Clear();
+                canvas.Clear(SKColors.Blue);
                 return;
             }
             else
             {
-                //canvas.DrawPoints(SKPointMode.)
-                //SKBitmap bmp = RawImage.Resize(e.Info.Size, SKFilterQuality.Medium);
                 canvas.DrawBitmap(RawImage, e.Info.Rect);
             }
-
-            //base.OnPaintSurface(e);
         }
     }
 }

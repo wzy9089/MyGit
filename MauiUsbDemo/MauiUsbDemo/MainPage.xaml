@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:fot="clr-namespace:KOGA.FOT.MAUI;assembly=KOGA.FOT.MAUI"
              x:Class="MauiUsbDemo.MainPage" 
              Loaded="ContentPage_Loaded" Unloaded="ContentPage_Unloaded">
@@ -10,36 +9,17 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a race car number eight" />
-            <fot:RawImageView x:Name="fotImg0" MinimumWidthRequest="1080" MinimumHeightRequest="54" />
-            <fot:RawImageView x:Name="fotImg1" MinimumWidthRequest="1080" MinimumHeightRequest="54" />
-            <Label
-                Text="Hello, World!"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
 
-            <Label
-                Text="Welcome to &#10;.NET Multi-platform App UI"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+            <fot:RawImageView x:Name="fotImg0" WidthRequest="1080" HeightRequest="54" />
+            <fot:RawImageView x:Name="fotImg1" WidthRequest="1080" HeightRequest="54" />
 
             <Button
                 x:Name="CounterBtn"
-                Text="Connect" 
+                Text="SetFeature Test" 
                 SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
+                Clicked="CounterBtn_Clicked"
                 HorizontalOptions="Fill" />
-            <Button
-                x:Name="DisconnectBtn"
-                Text="Disconnect" 
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="DisconnectBtn_Clicked"
-                HorizontalOptions="Fill" />
+
         </VerticalStackLayout>
     </ScrollView>
 
