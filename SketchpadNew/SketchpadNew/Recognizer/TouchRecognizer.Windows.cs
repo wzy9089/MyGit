@@ -59,7 +59,7 @@ namespace SketchpadNew.Recognizer
             if (e.Pointer.PointerDeviceType != PointerDeviceType.Touch)
                 return;
 
-            Debug.WriteLine($"OnPointerReleased:{e.Pointer.PointerId}");
+            //Debug.WriteLine($"OnPointerReleased:{e.Pointer.PointerId}");
             var pt = GetTouchPointer(sender, e);
             TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Released, pt));
         }
@@ -69,7 +69,7 @@ namespace SketchpadNew.Recognizer
             if (e.Pointer.PointerDeviceType != PointerDeviceType.Touch)
                 return;
 
-            Debug.WriteLine($"OnPointerMoved:{e.Pointer.PointerId}");
+            //Debug.WriteLine($"OnPointerMoved:{e.Pointer.PointerId}");
             var pts = GetHistoryTouchPointers(sender, e);
             TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Moved, pts));
         }
@@ -79,8 +79,8 @@ namespace SketchpadNew.Recognizer
             if (e.Pointer.PointerDeviceType != PointerDeviceType.Touch)
                 return;
 
-            Debug.WriteLine($"OnPointerPressed:{e.Pointer.PointerId}");
             var pt = GetTouchPointer(sender, e);
+            Debug.WriteLine($"OnPointerPressed:{e.Pointer.PointerId},{pt.Position}");
             TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Pressed, pt));
         }
 

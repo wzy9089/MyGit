@@ -45,12 +45,13 @@ namespace SketchpadNew.Recognizer
             var screenPointerCoords = new Point(mve.GetX(pointerIndex),
                                                   mve.GetY(pointerIndex));
             var touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
+            var size = mve.GetSize(pointerIndex);
 
             switch (mve?.ActionMasked)
             {
                 case MotionEventActions.Down:
                 case MotionEventActions.PointerDown:
-                    InvokeTouchActionEvent(id, TouchActionTypes.Pressed, screenPointerCoords, touchSize, true);
+                    InvokeTouchActionEvent(id, TouchActionTypes.Pressed, screenPointerCoords, touchSize, size, true);
                     break;
 
                 case MotionEventActions.Move:
@@ -107,7 +108,7 @@ namespace SketchpadNew.Recognizer
                                                         || screenPointerCoords != _oldscreenPointerCoords)
                             {
                                 _oldscreenPointerCoords = screenPointerCoords;
-                                InvokeTouchActionEvent(id, TouchActionTypes.Moved, screenPointerCoords, touchSize, true);
+                                InvokeTouchActionEvent(id, TouchActionTypes.Moved, screenPointerCoords, touchSize, size, true);
                             }
                         }
                     }
@@ -115,15 +116,15 @@ namespace SketchpadNew.Recognizer
 
                 case MotionEventActions.Up:
                 case MotionEventActions.PointerUp:
-                    InvokeTouchActionEvent(id, TouchActionTypes.Released, screenPointerCoords, touchSize, false);
+                    InvokeTouchActionEvent(id, TouchActionTypes.Released, screenPointerCoords, touchSize, size, false);
                     break;
                 case MotionEventActions.Cancel:
-                    InvokeTouchActionEvent(id, TouchActionTypes.Cancelled, screenPointerCoords, touchSize, false);
+                    InvokeTouchActionEvent(id, TouchActionTypes.Cancelled, screenPointerCoords, touchSize, size, false);
                     break;
             }
         }
 
-        void InvokeTouchActionEvent(int id, TouchActionTypes actionType, Point pointerLocation,Size pointerSize, bool isInContact)
+        void InvokeTouchActionEvent(int id, TouchActionTypes actionType, Point pointerLocation,Size pointerSize, float size, bool isInContact)
         {
             //_view.GetLocationOnScreen(twoIntArray);
             //double x = pointerLocation.X - twoIntArray[0];
@@ -136,7 +137,7 @@ namespace SketchpadNew.Recognizer
                 Size = pointerSize
             };
 
-            Debug.WriteLine(id + " " + actionType + " " + pointerSize);
+            Debug.WriteLine($"{id},{actionType},{pointerLocation},{pointerSize},{size}");
             TouchAction?.Invoke(this, new TouchActionEventArgs(actionType,touchPointer));
         }
 

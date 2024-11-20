@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="WriteBoard.DrawControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WriteBoard"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    mc:Ignorable="d"
+    Unloaded="UserControl_Unloaded">
+
+    <Grid>
+        <canvas:CanvasControl x:Name="strokeCanvas" Draw="strokeCanvas_Draw"/>
+        <canvas:CanvasControl x:Name="inkCanvas" Draw="inkCanvas_Draw" CreateResources="inkCanvas_CreateResources" PointerMoved="inkCanvas_PointerMoved" PointerPressed="inkCanvas_PointerPressed" PointerReleased="inkCanvas_PointerReleased"/>
+    </Grid>
+</UserControl>
