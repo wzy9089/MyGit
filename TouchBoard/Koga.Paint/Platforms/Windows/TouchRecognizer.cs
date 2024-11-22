@@ -14,7 +14,7 @@ namespace Koga.Paint.Recognizer
     public partial class TouchRecognizer
     {
         FrameworkElement? _view;
-        public partial void Initialize(SKCanvasView view)
+        public partial void Initialize(Microsoft.Maui.Controls.View view)
         {
             _view = view.Handler?.PlatformView as FrameworkElement;
             if (_view != null)

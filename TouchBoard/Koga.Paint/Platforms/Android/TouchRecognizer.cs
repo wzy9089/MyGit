@@ -19,7 +19,7 @@ namespace Koga.Paint.Recognizer
         int[] twoIntArray = new int[2];
         private Point _oldscreenPointerCoords;
 
-        public partial void Initialize(SKCanvasView view)
+        public partial void Initialize(Microsoft.Maui.Controls.View view)
         {
             _view = view.Handler?.PlatformView as View;
             if (_view != null)

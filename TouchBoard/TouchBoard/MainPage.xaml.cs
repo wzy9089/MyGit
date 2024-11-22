@@ -18,15 +18,14 @@ namespace TouchBoard
             canvas.Clear(SKColors.Green);
         }
 
-        private void canvasView_TouchAction(object sender, Koga.Paint.Recognizer.TouchActionEventArgs e)
+        private void btnExit_Clicked(object sender, EventArgs e)
         {
-            
+            Application.Current?.Quit();
         }
 
-        private void glview_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintGLSurfaceEventArgs e)
+        private void btnClear_Clicked(object sender, EventArgs e)
         {
-            var canvas= e.Surface.Canvas;
-            canvas.Clear(SKColors.DarkGray);
+            paintControl.Clear();
         }
     }
 

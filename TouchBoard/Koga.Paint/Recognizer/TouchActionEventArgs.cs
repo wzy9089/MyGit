@@ -12,20 +12,20 @@ namespace Koga.Paint.Recognizer
         public List<TouchPointer> HistoricalPointers { get; private set; }
         public TouchPointer Pointer { get; private set; }
 
-        public TouchActionTypes Type { get; private set; }
+        public TouchActionTypes ActionType { get; private set; }
 
         internal TouchActionEventArgs(TouchActionTypes type, List<TouchPointer> historicalPointers)
         {
             Debug.Assert(historicalPointers != null && historicalPointers.Count > 0);
 
-            Type = type;
+            ActionType = type;
             HistoricalPointers = historicalPointers;
             Pointer = historicalPointers.Last();
         }
 
         internal TouchActionEventArgs(TouchActionTypes type, TouchPointer pointer)
         {
-            Type = type;
+            ActionType = type;
             Pointer = pointer;
             HistoricalPointers = new List<TouchPointer> { pointer };
         }

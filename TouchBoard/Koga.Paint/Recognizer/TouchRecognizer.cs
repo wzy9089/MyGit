@@ -11,12 +11,12 @@ namespace Koga.Paint.Recognizer
     {
         public event EventHandler<TouchActionEventArgs>? TouchAction;
 
-        public TouchRecognizer(SKCanvasView view)
+        public TouchRecognizer(View view)
         {
             Initialize(view);
         }
 
-        public partial void Initialize(SKCanvasView view);
+        public partial void Initialize(View view);
 
         public partial void Dispose();
     }

@@ -10,6 +10,8 @@ namespace Koga.Paint
 {
     public class StrokeBuilder
     {
+        internal static readonly float K = 0.6f;
+
         public static SKPath CreateCubicStroke(List<SKPoint> stroke, float k)
         {
             SKPath strokePath = new SKPath();
