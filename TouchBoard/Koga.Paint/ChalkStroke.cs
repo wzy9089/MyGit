@@ -10,6 +10,7 @@ namespace Koga.Paint
     public class ChalkStroke:Stroke
     {
         SKPaint _StrokePaint;
+        SKPaint _StrokePaintFast;
 
         static Dictionary<SKColor, SKShader> ShakerDict = new Dictionary<SKColor, SKShader>();
 
@@ -25,21 +26,26 @@ namespace Koga.Paint
                 StrokeCap = SKStrokeCap.Square,
                 StrokeWidth = width,
                 BlendMode = SKBlendMode.Overlay,
-                MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 2)
+                MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1)
             };
 
             _StrokePaint.Shader = GetChalkTextureShader(color);
+
+            _StrokePaintFast = _StrokePaint.Clone();
+            //_StrokePaintFast.MaskFilter = null;
+            _StrokePaintFast.BlendMode = SKBlendMode.Src;
         }
         internal override void Draw(SKCanvas canvas, bool lastSegmentOnly)
         {
-            _StrokePaint.StrokeWidth = Width;
 
             if (lastSegmentOnly)
             {
-                canvas.DrawPath(LastPathSegment, _StrokePaint);
+                _StrokePaintFast.StrokeWidth = Width;
+                canvas.DrawPath(LastPathSegment, _StrokePaintFast);
             }
             else
             {
+                _StrokePaint.StrokeWidth = Width;
                 canvas.DrawPath(Path, _StrokePaint);
             }
         }

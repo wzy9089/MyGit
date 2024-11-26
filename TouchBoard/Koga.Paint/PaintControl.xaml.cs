@@ -18,6 +18,7 @@ public partial class PaintControl : ContentView
     private async void paintView_StrokeCreated(object sender, StrokeCreatedEventArgs e)
     {
         await pageView.AddStroke(e.Stroke);
+        paintView.InvalidateSurface();
     }
 
     public void Clear()

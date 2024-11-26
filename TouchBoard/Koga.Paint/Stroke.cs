@@ -45,7 +45,7 @@ namespace Koga.Paint
             }
         }
 
-        private void BuildPath(List<SKPoint> points, SKPath path)
+        internal virtual void BuildPath(List<SKPoint> points, SKPath path)
         {
             path.Reset();
 

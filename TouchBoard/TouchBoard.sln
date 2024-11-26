@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116 d17.12
+VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchBoard", "TouchBoard\TouchBoard.csproj", "{157504DE-838A-49DD-AEA7-C4E4630AEAF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Koga.Paint", "Koga.Paint\Koga.Paint.csproj", "{3A63F2E3-E4EE-4666-B948-8C0647423E31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{2D086B13-EF24-4D82-88DE-C5ABDAE4D31A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +24,10 @@ Global
 		{3A63F2E3-E4EE-4666-B948-8C0647423E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A63F2E3-E4EE-4666-B948-8C0647423E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A63F2E3-E4EE-4666-B948-8C0647423E31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D086B13-EF24-4D82-88DE-C5ABDAE4D31A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D086B13-EF24-4D82-88DE-C5ABDAE4D31A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D086B13-EF24-4D82-88DE-C5ABDAE4D31A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D086B13-EF24-4D82-88DE-C5ABDAE4D31A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

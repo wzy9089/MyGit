@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+             x:Class="Test.MainPage">
+
+    <ContentPage.Resources>
+        <Style TargetType="Button">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <Setter.Value>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="Scale"    Value="1.0"/>
+                                    <Setter Property="BackgroundColor" Value="DarkGray" />
+                                    <Setter Property="TextColor" Value="Black" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="Scale" Value="0.8" />
+                                    <Setter Property="BackgroundColor" Value="LightGray" />
+                                    <Setter Property="TextColor" Value="Black" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="PointerOver">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="LightGray" />
+                                    <Setter Property="TextColor" Value="Black" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <ContentView x:Name="viewContent" Grid.RowSpan="2"/>
+
+        <Border Grid.Row="1" Padding="5" BackgroundColor="Gray" HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10,10,10,10"/>
+            </Border.StrokeShape>
+
+            <StackLayout Spacing="10" Orientation="Horizontal" >
+                <Label x:Name="lblStrokeWidth" TextColor="Black" Text="{Binding Source={x:Reference slider},Path=Value,StringFormat='Width:{0:f0}'}" VerticalOptions="Center" WidthRequest="60"/>
+                <Slider x:Name="slider" Minimum="10" Maximum="100" Value="50" WidthRequest="100" VerticalOptions="Center"/>
+                <Button Text="Test" x:Name="btnTest" Clicked="btnTest_Clicked"/>
+                <Button Text="Exit" x:Name="btnExit" Clicked="btnExit_Clicked"/>
+            </StackLayout>
+
+        </Border>
+
+    </Grid>
+</ContentPage>

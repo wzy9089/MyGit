@@ -31,7 +31,7 @@ namespace Koga.Paint
                 case TouchActionTypes.Pressed:
                     if(!_Strokes.ContainsKey(e.Pointer.PointerId))
                     {
-                        _Strokes.Add(e.Pointer.PointerId, new ChalkStroke(SKColors.White, 8));
+                        _Strokes.Add(e.Pointer.PointerId, new BrushStroke(SKColors.White, 8));
                         _Strokes[e.Pointer.PointerId].StrokeStart(ToDipPoint(e.Pointer.Position));
                     }
                     break;
@@ -62,7 +62,7 @@ namespace Koga.Paint
 
                         _Strokes.Remove(e.Pointer.PointerId);
                         _NeedClear = true;
-                        InvalidateSurface();
+                        //InvalidateSurface();
                     }
                     break;
             }

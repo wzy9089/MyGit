@@ -389,5 +389,128 @@ namespace Koga.Paint
 
             return controls;
         }
+
+        public static float ComputeStrokeWidthBySpeed(SKPoint p0, SKPoint p1,float baseWidth,float maxSpeed)
+        {
+            SKPoint v = p1 - p0;
+
+            float speed = maxSpeed - v.Length;
+            speed = (speed < 1 ? 1 : speed) / maxSpeed;
+            float w = baseWidth * speed;
+
+            return w;
+        }
+
+        public static void MakeBrushStrokeSegment(SKPoint p0,float w0, SKPoint p1, float w1, SKPath path)
+        {
+            SKPoint v = p1 - p0;
+
+            if (v.Length <= Math.Abs(w1 - w0))
+            {
+                if(w1 > w0)
+                {
+                    path.AddCircle(p1.X, p1.Y, w1, SKPathDirection.Clockwise);
+                }
+
+                return;
+            }
+
+            var points = ComputeTangentPoints(p0, w0, p1, w1);
+
+            if (points.Count > 0)
+            {
+                path.MoveTo(points[0]);
+                path.LineTo(points[1]);
+                path.LineTo(points[2]);
+                path.LineTo(points[3]);
+                path.Close();
+            }
+            path.AddCircle(p1.X, p1.Y, w1, SKPathDirection.Clockwise);
+        }
+
+        public static SKPath CreateBrushStroke(List<SKPoint> stroke, float strokeWidth, float maxSpeed)
+        {
+            SKPath path = new SKPath();
+
+            if (stroke.Count < 1)
+            {
+                return path;
+            }
+
+            float lastWidth = 0.5f;
+
+            path.AddCircle(stroke[0].X, stroke[0].Y, lastWidth, SKPathDirection.Clockwise);
+
+            for (int i = 1; i < stroke.Count; i++)
+            {
+                SKPoint p0 = stroke[i - 1];
+                SKPoint p1 = stroke[i];
+                SKPoint v = p1 - p0;
+
+                float w = ComputeStrokeWidthBySpeed(p0, p1, strokeWidth, maxSpeed);
+
+                if (i == stroke.Count - 1) w = .5f;
+
+                MakeBrushStrokeSegment(p0, lastWidth, p1, w, path);
+
+                //if (v.Length <= Math.Abs(w - lastWidth))
+                //{
+                //    if (w > lastWidth)
+                //    {
+                //        path.AddCircle(p1.X, p1.Y, w, SKPathDirection.Clockwise);
+                //    }
+
+                //    lastWidth = w;
+
+                //    continue;
+                //}
+
+                //var points = ComputeTangentPoints(p0, lastWidth, p1, w);
+                //if (points.Count > 0)
+                //{
+                //    path.MoveTo(points[0]);
+                //    path.LineTo(points[1]);
+                //    path.LineTo(points[2]);
+                //    path.LineTo(points[3]);
+                //    path.Close();
+                //}
+
+                //path.AddCircle(p1.X, p1.Y, w, SKPathDirection.Clockwise);
+
+                lastWidth = w;
+            }
+
+            return path;
+        }
+
+        //计算两个圆的外公切线切点
+        public static List<SKPoint> ComputeTangentPoints(SKPoint p1, float r1, SKPoint p2, float r2)
+        {
+            List<SKPoint> points = new List<SKPoint>();
+
+            SKPoint dp = p2 - p1;
+
+            if (dp.Length <= Math.Abs(r1 - r2))
+            {
+                return points;
+            }
+
+            double d = dp.Length;
+
+            //圆心连线角度
+            double theta = Math.Atan2(dp.Y, dp.X);
+
+            //外公切线角
+            double alpha = Math.Asin((r1 - r2) / dp.Length) - Math.PI * 0.5;
+
+            //求外公切线切点
+            points.Add(new SKPoint((float)(p1.X + r1 * Math.Cos(theta + alpha)), (float)(p1.Y + r1 * Math.Sin(theta + alpha))));
+            points.Add(new SKPoint((float)(p2.X + r2 * Math.Cos(theta + alpha)), (float)(p2.Y + r2 * Math.Sin(theta + alpha))));
+            points.Add(new SKPoint((float)(p2.X + r2 * Math.Cos(theta - alpha)), (float)(p2.Y + r2 * Math.Sin(theta - alpha))));
+            points.Add(new SKPoint((float)(p1.X + r1 * Math.Cos(theta - alpha)), (float)(p1.Y + r1 * Math.Sin(theta - alpha))));
+
+            return points;
+        }
+
     }
 }
