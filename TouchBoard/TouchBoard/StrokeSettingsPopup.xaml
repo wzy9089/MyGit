@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mck:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mck="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="TouchBoard.StrokeSettingsPopup"
+           Size="250,400" Color="Transparent">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Border Grid.ColumnSpan="3" Grid.RowSpan="3" Background="Black" StrokeThickness="0">
+            <Border.Shadow>
+                <Shadow Brush="Black"
+                Offset="5,5"
+                Opacity="0.8" />
+            </Border.Shadow>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+        </Border>
+        <VerticalStackLayout Grid.Row="1" RadioButtonGroup.GroupName="strokes" RadioButtonGroup.SelectedValue="{Binding Selection}">
+            <RadioButton Content="0" Value="0" IsChecked="True"/>
+            <RadioButton Content="1" Value="1"/>
+            <RadioButton Content="2" Value="2"/>
+            <RadioButton Content="3" Value="3"/>
+            <RadioButton Content="4" Value="4"/>
+            <Label x:Name="strokeLabel">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="(" />
+                        <Span Text="{Binding Selection}" />
+                        <Span Text=")" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </VerticalStackLayout>
+    </Grid>
+</mck:Popup>

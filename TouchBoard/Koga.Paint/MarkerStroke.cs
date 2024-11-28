@@ -17,6 +17,10 @@ namespace Koga.Paint
             MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Solid, 1),
         };
 
+        public MarkerStroke() : this(new List<SKPoint>(), SKColors.Red, 7)
+        {
+        }
+
         public MarkerStroke(SKColor color, float width) : this(new List<SKPoint>(), color, width)
         {
         }

@@ -2,6 +2,10 @@
 using System.Diagnostics;
 using SkiaSharp.Views.Maui.Controls;
 
+#if ANDROID
+using Android.Graphics;
+#endif
+
 namespace Test
 {
     public partial class MainPage : ContentPage
@@ -44,9 +48,9 @@ namespace Test
 
         private void PaintSurface(SKSurface surface, SKImageInfo info)
         {
+            var canvas = surface.Canvas;
             if(_StartTest)
             {
-                var canvas = surface.Canvas;
                 Random rand = new Random();
 
                 SKBitmap bmp = CreateBitmap(info.Width, info.Height);
@@ -63,16 +67,49 @@ namespace Test
 
                 sw.Stop();
                 watch.Stop();
-                using (var paint = new SKPaint())
+                using (var dpaint = new SKPaint())
                 {
-                    paint.IsAntialias = true;
-                    paint.Color = SKColors.Black;
-                    paint.IsStroke = false;
+                    dpaint.IsAntialias = true;
+                    dpaint.Color = SKColors.Black;
+                    dpaint.IsStroke = false;
 
-                    canvas.DrawText($"Time: {sw.ElapsedMilliseconds} ms, total: {watch.ElapsedMilliseconds} ms", 10f, 100f,new SKFont(SKTypeface.Default,48), paint);
+                    canvas.DrawText($"Time: {sw.ElapsedMilliseconds} ms, total: {watch.ElapsedMilliseconds} ms", 10f, 100f,new SKFont(SKTypeface.Default,48), dpaint);
                 }
             }
 
+
+            // 原始形状路径
+            SKPath shapePath = new SKPath();
+            //shapePath.AddCircle(0, 0, 10); // 一个圆形作为例子
+            shapePath.AddOval(new SKRect(0, 0, 5, 15));
+
+            // 目标曲线路径
+            SKPath curvePath = new SKPath();
+            curvePath.MoveTo(10, 100);
+            //curvePath.CubicTo(60, 20, 240, 280, 400, 100);
+            curvePath.CubicTo(600, 20, 840, 280, 1000, 100);
+
+            // 创建变换矩阵
+            SKMatrix matrix = SKMatrix.CreateScale(0.5f, 0.5f); // 拉伸
+                                                                // 或者创建自定义扭曲
+                                                                // matrix = SKMatrix.MakeSkew(0.3f, 0.1f);
+
+            // 应用变换
+            SKPathEffect pathEffect = SKPathEffect.Create1DPath(shapePath,1,0,SKPath1DPathEffectStyle.Rotate);//SKPathEffect.Create2DPath(matrix, shapePath);
+            //SKPathEffect pathEffect = SKPathEffect.Create2DPath;//SKPathEffect.Create2DPath(matrix, shapePath);
+
+
+            // 绘制变形的路径
+            SKPaint paint = new SKPaint
+            {
+                IsAntialias = true,
+                PathEffect = pathEffect,
+                Color = SKColors.White,
+                //Style = SKPaintStyle.Stroke
+            };
+
+            // 在 Canvas 上绘制
+            canvas.DrawPath(curvePath, paint);
 
             _StartTest = false;
         }

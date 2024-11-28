@@ -3,9 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:koga="clr-namespace:Koga.Paint;assembly=Koga.Paint"
+             xmlns:local="clr-namespace:TouchBoard"
              x:Class="TouchBoard.MainPage">
     <ContentPage.Resources>
         <Style TargetType="Button">
+            <Setter Property="WidthRequest" Value="42"/>
+            <Setter Property="HeightRequest" Value="42"/>
+            <Setter Property="HorizontalOptions" Value="Center"/>
+            <Setter Property="VerticalOptions"  Value="Center"/>
+            <Setter Property="BackgroundColor"  Value="Black"/>
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="BorderColor" Value="Black"/>
+            <Setter Property="BorderWidth" Value="1"/>
+            <Setter Property="FontSize" Value="20"/>
+
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <Setter.Value>
                     <VisualStateGroupList>
@@ -13,21 +24,23 @@
                             <VisualState x:Name="Normal">
                                 <VisualState.Setters>
                                     <Setter Property="Scale"    Value="1.0"/>
-                                    <Setter Property="BackgroundColor" Value="DarkGray" />
-                                    <Setter Property="TextColor" Value="Black" />
+                                    <Setter Property="BackgroundColor" Value="Black" />
+                                    <Setter Property="TextColor" Value="White" />
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="Pressed">
                                 <VisualState.Setters>
-                                    <Setter Property="Scale" Value="0.8" />
-                                    <Setter Property="BackgroundColor" Value="LightGray" />
-                                    <Setter Property="TextColor" Value="Black" />
+                                    <Setter Property="Scale" Value="0.9" />
+                                    <Setter Property="BackgroundColor" Value="Gray" />
+                                    <Setter Property="BorderColor" Value="DarkGray"/>
+                                    <Setter Property="TextColor" Value="White" />
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="PointerOver">
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="LightGray" />
-                                    <Setter Property="TextColor" Value="Black" />
+                                    <Setter Property="BackgroundColor" Value="DarkGray" />
+                                    <Setter Property="BorderColor" Value="LightGray"/>
+                                    <Setter Property="TextColor" Value="White" />
                                 </VisualState.Setters>
                             </VisualState>
                         </VisualStateGroup>
@@ -35,30 +48,59 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="boxButton" TargetType="BoxView">
+            <Setter Property="WidthRequest" Value="40"/>
+            <Setter Property="HeightRequest" Value="40"/>
+            <Setter Property="HorizontalOptions" Value="Center"/>
+            <Setter Property="VerticalOptions"  Value="Center"/>
+            <Setter Property="BackgroundColor"  Value="Black"/>
+            <Setter Property="CornerRadius" Value="5,5,5,5" />
+        </Style>
     </ContentPage.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="7*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <koga:PaintControl x:Name="paintControl" Grid.Row="0" Grid.RowSpan="2" />
-        
-        <Border Grid.Row="1" Padding="5" BackgroundColor="Gray" HorizontalOptions="Center">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10,10,10,10"/>
-            </Border.StrokeShape>
+        <BoxView Grid.Row="0" Grid.Column="0" BackgroundColor="LightGray"/>
+        <BoxView Grid.Row="0" Grid.Column="1" BackgroundColor="LightCoral"/>
+        <BoxView Grid.Row="0" Grid.Column="2" BackgroundColor="LightCyan"/>
+        <BoxView Grid.Row="1" Grid.Column="0" BackgroundColor="AliceBlue"/>
+        <BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="Aqua"/>
+        <BoxView Grid.Row="1" Grid.Column="2" BackgroundColor="Azure"/>
+        <BoxView Grid.Row="2" Grid.Column="0" BackgroundColor="Bisque"/>
+        <BoxView Grid.Row="2" Grid.Column="1" BackgroundColor="BlanchedAlmond"/>
+        <BoxView Grid.Row="2" Grid.Column="2" BackgroundColor="Brown"/>
 
-            <StackLayout Spacing="10" Orientation="Horizontal" >
+
+        <koga:PaintControl x:Name="paintControl" Grid.RowSpan="3" Grid.ColumnSpan="3" />
+
+
+        <HorizontalStackLayout Grid.Row="2" Grid.Column="1" Spacing="8" HorizontalOptions="Center">
+            
+               <!-- 
                 <Label x:Name="lblStrokeWidth" TextColor="Black" Text="{Binding Source={x:Reference slider},Path=Value,StringFormat='Width:{0:f0}'}" VerticalOptions="Center" WidthRequest="60"/>
                 <Slider x:Name="slider" Minimum="10" Maximum="100" Value="50" WidthRequest="100" VerticalOptions="Center"/>
-                <Button Text="Clear" x:Name="btnClear" Clicked="btnClear_Clicked"/>
-                <Button Text="Exit" x:Name="btnExit" Clicked="btnExit_Clicked"/>
-            </StackLayout>
+                -->
+            <Button Text="✎" CommandParameter="笔" Grid.Column="2" x:Name="btn1" Clicked="btnTool_Clicked"/>
+            <Button Text="擦" Grid.Column="3" x:Name="btn2" Clicked="btnClear_Clicked"/>
+            <Button Text="□" Grid.Column="4" x:Name="btn3" Clicked="btnTool_Clicked"/>
+            <Button Text="☆" Grid.Column="5" x:Name="btn4" Clicked="btnTool_Clicked"/>
+            <Button Text="♣" Grid.Column="6" x:Name="btn5" Clicked="btnTool_Clicked"/>
+            <Button Text="↖" Grid.Column="7" x:Name="btn6" Clicked="btnTool_Clicked"/>
+            <Button Text="↗" Grid.Column="8" x:Name="btnClear" Clicked="btnTool_Clicked"/>
+            <Button Text="×" Grid.Column="9" x:Name="btnExit" Clicked="btnExit_Clicked"/>
 
-        </Border>
-
+        </HorizontalStackLayout>
+        
     </Grid>
 
 </ContentPage>

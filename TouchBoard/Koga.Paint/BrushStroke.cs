@@ -18,7 +18,11 @@ namespace Koga.Paint
 
         static readonly float MAX_SPEED = 40;
 
-        public BrushStroke(SKColor color,float width) : base(StrokeTypes.Brush, new List<SKPoint>(), color, width)
+        public BrushStroke() : this(new List<SKPoint>(), SKColors.Black, 10f)
+        {
+        }
+
+        public BrushStroke(SKColor color,float width) : this(new List<SKPoint>(), color, width)
         {
         }
 
@@ -32,7 +36,7 @@ namespace Koga.Paint
             path.AddPath(StrokeBuilder.CreateBrushStroke(points, Width, MAX_SPEED));
         }
 
-        float _LastStrokeWidth = 0.5f;
+        float _LastStrokeWidth = 1f;
         internal override void StrokeStart(SKPoint point)
         {
             if (Points.Count > 0)
@@ -42,9 +46,9 @@ namespace Koga.Paint
             Path.Reset();
             LastPathSegment.Reset();
 
-            Path.AddCircle(point.X, point.Y, 0.5f, SKPathDirection.Clockwise);
-            LastPathSegment.AddCircle(point.X, point.Y, 0.5f, SKPathDirection.Clockwise);
-            _LastStrokeWidth = 0.5f;
+            Path.AddCircle(point.X, point.Y, 1f, SKPathDirection.Clockwise);
+            LastPathSegment.AddCircle(point.X, point.Y, 1f, SKPathDirection.Clockwise);
+            _LastStrokeWidth = 1f;
         }
 
         internal override void StrokeAdd(SKPoint point, bool isNewSegment)

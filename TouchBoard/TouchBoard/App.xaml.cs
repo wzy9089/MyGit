@@ -14,7 +14,7 @@ namespace TouchBoard
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            var window = new Window(new AppShell());
+            var window = new Window(new MainPage());
             window.MaximumWidth = double.PositiveInfinity;
             window.MaximumHeight = double.PositiveInfinity;
             window.MinimumWidth = 0;

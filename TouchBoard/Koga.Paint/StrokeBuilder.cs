@@ -390,13 +390,28 @@ namespace Koga.Paint
             return controls;
         }
 
-        public static float ComputeStrokeWidthBySpeed(SKPoint p0, SKPoint p1,float baseWidth,float maxSpeed)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p0"></param>
+        /// <param name="p1"></param>
+        /// <param name="baseWidth"></param>
+        /// <param name="maxSpeed"></param>
+        /// <param name="thinRate">笔画变细的比率，0.1~0.5</param>
+        /// <returns></returns>
+        public static float ComputeStrokeWidthBySpeed(SKPoint p0, SKPoint p1, float baseWidth, float maxSpeed = 50, float thinRate = 0.2f)
         {
+            if (thinRate > 0.5f || thinRate < 0.1f)
+            {
+                thinRate = 0.3f;
+            }
+
             SKPoint v = p1 - p0;
 
             float speed = maxSpeed - v.Length;
             speed = (speed < 1 ? 1 : speed) / maxSpeed;
             float w = baseWidth * speed;
+            w = w < baseWidth * thinRate ? baseWidth * thinRate : w;
 
             return w;
         }
@@ -404,6 +419,9 @@ namespace Koga.Paint
         public static void MakeBrushStrokeSegment(SKPoint p0,float w0, SKPoint p1, float w1, SKPath path)
         {
             SKPoint v = p1 - p0;
+
+            w0 *= 0.5f;
+            w1 *= 0.5f;
 
             if (v.Length <= Math.Abs(w1 - w0))
             {
@@ -437,7 +455,7 @@ namespace Koga.Paint
                 return path;
             }
 
-            float lastWidth = 0.5f;
+            float lastWidth = 1f;
 
             path.AddCircle(stroke[0].X, stroke[0].Y, lastWidth, SKPathDirection.Clockwise);
 
@@ -449,33 +467,10 @@ namespace Koga.Paint
 
                 float w = ComputeStrokeWidthBySpeed(p0, p1, strokeWidth, maxSpeed);
 
-                if (i == stroke.Count - 1) w = .5f;
+                //3个点以上，最后一个点变细
+                if (stroke.Count>2 && i == stroke.Count - 1) w = 1f;
 
                 MakeBrushStrokeSegment(p0, lastWidth, p1, w, path);
-
-                //if (v.Length <= Math.Abs(w - lastWidth))
-                //{
-                //    if (w > lastWidth)
-                //    {
-                //        path.AddCircle(p1.X, p1.Y, w, SKPathDirection.Clockwise);
-                //    }
-
-                //    lastWidth = w;
-
-                //    continue;
-                //}
-
-                //var points = ComputeTangentPoints(p0, lastWidth, p1, w);
-                //if (points.Count > 0)
-                //{
-                //    path.MoveTo(points[0]);
-                //    path.LineTo(points[1]);
-                //    path.LineTo(points[2]);
-                //    path.LineTo(points[3]);
-                //    path.Close();
-                //}
-
-                //path.AddCircle(p1.X, p1.Y, w, SKPathDirection.Clockwise);
 
                 lastWidth = w;
             }

@@ -14,10 +14,14 @@ namespace Koga.Paint
 
         static Dictionary<SKColor, SKShader> ShakerDict = new Dictionary<SKColor, SKShader>();
 
+        public ChalkStroke():this(new List<SKPoint>(), SKColors.White, 10)
+        {
+        }
 
         public ChalkStroke(SKColor color, float width) : this(new List<SKPoint>(), color, width)
         {
         }
+
         public ChalkStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeTypes.Chalk, points, color, width)
         {
             _StrokePaint = new SKPaint()
@@ -26,7 +30,7 @@ namespace Koga.Paint
                 StrokeCap = SKStrokeCap.Square,
                 StrokeWidth = width,
                 BlendMode = SKBlendMode.Overlay,
-                MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1)
+                MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1),
             };
 
             _StrokePaint.Shader = GetChalkTextureShader(color);
