@@ -7,7 +7,7 @@ public partial class StrokeSettingsPopup : Popup
     public StrokeSettingsPopup()
 	{
         InitializeComponent();
-		
+
 		BindingContext = ViewModel;
-    }
+	}
 }

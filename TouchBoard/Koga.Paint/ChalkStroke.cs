@@ -29,7 +29,7 @@ namespace Koga.Paint
                 Style = SKPaintStyle.Stroke,
                 StrokeCap = SKStrokeCap.Square,
                 StrokeWidth = width,
-                BlendMode = SKBlendMode.Overlay,
+                //BlendMode = SKBlendMode.Overlay,
                 MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, 1),
             };
 

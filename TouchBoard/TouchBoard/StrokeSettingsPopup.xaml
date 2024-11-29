@@ -26,12 +26,12 @@
                 <RoundRectangle CornerRadius="10" />
             </Border.StrokeShape>
         </Border>
-        <VerticalStackLayout Grid.Row="1" RadioButtonGroup.GroupName="strokes" RadioButtonGroup.SelectedValue="{Binding Selection}">
-            <RadioButton Content="0" Value="0" IsChecked="True"/>
-            <RadioButton Content="1" Value="1"/>
-            <RadioButton Content="2" Value="2"/>
-            <RadioButton Content="3" Value="3"/>
-            <RadioButton Content="4" Value="4"/>
+        <VerticalStackLayout Grid.Row="1" RadioButtonGroup.GroupName="strokes">
+            <RadioButton Content="0" IsChecked="{Binding Selection, Converter={StaticResource StringToBooleanConvert}, ConverterParameter=0, Mode=TwoWay}" />
+            <RadioButton Content="1" IsChecked="{Binding Selection, Converter={StaticResource StringToBooleanConvert}, ConverterParameter=1, Mode=TwoWay}" />
+            <RadioButton Content="2" IsChecked="{Binding Selection, Converter={StaticResource StringToBooleanConvert}, ConverterParameter=2, Mode=TwoWay}" />
+            <RadioButton Content="3" IsChecked="{Binding Selection, Converter={StaticResource StringToBooleanConvert}, ConverterParameter=3, Mode=TwoWay}" />
+            <RadioButton Content="4" IsChecked="{Binding Selection, Converter={StaticResource StringToBooleanConvert}, ConverterParameter=4, Mode=TwoWay}" />
             <Label x:Name="strokeLabel">
                 <Label.FormattedText>
                     <FormattedString>

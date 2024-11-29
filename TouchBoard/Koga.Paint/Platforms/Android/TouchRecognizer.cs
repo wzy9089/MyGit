@@ -39,9 +39,7 @@ namespace Koga.Paint.Recognizer
             var senderView = sender as Android.Views.View;
             var pointerIndex = mve.ActionIndex;
             var id = mve.GetPointerId(pointerIndex);
-            //senderView.GetLocationOnScreen(twoIntArray);
-            //var screenPointerCoords = new Point(twoIntArray[0] + mve.GetX(pointerIndex),
-            //                                      twoIntArray[1] + mve.GetY(pointerIndex));
+
             var screenPointerCoords = new Point(mve.GetX(pointerIndex),
                                                   mve.GetY(pointerIndex));
             var touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
@@ -80,16 +78,6 @@ namespace Koga.Paint.Recognizer
                                 });
                             }
 
-                            screenPointerCoords = new Point(mve.GetX(pointerIndex),
-                                                              mve.GetY(pointerIndex));
-                            touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
-                            hisPoints.Add(new TouchPointer
-                            {
-                                PointerId = (uint)id,
-                                Position = screenPointerCoords,
-                                Size = touchSize
-                            });
-
                             TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Moved, hisPoints));
                         }
                     }
@@ -98,21 +86,24 @@ namespace Koga.Paint.Recognizer
                         for (pointerIndex = 0; pointerIndex < mve.PointerCount; pointerIndex++)
                         {
                             id = mve.GetPointerId(pointerIndex);
-                            //senderView.GetLocationOnScreen(twoIntArray);
 
-                            //screenPointerCoords = new Point(twoIntArray[0] + mve.GetX(pointerIndex),
-                            //                                twoIntArray[1] + mve.GetY(pointerIndex));
                             screenPointerCoords = new Point(mve.GetX(pointerIndex),
                                                                   mve.GetY(pointerIndex));
 
                             touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
 
-                            if (_oldscreenPointerCoords == default
-                                                        || screenPointerCoords != _oldscreenPointerCoords)
+                            TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Moved, new TouchPointer
                             {
-                                _oldscreenPointerCoords = screenPointerCoords;
-                                InvokeTouchActionEvent(id, TouchActionTypes.Moved, screenPointerCoords, touchSize, size, true);
-                            }
+                                PointerId = (uint)id,
+                                Position = screenPointerCoords,
+                                Size = touchSize
+                            }));
+                            //if (_oldscreenPointerCoords == default
+                            //                            || screenPointerCoords != _oldscreenPointerCoords)
+                            //{
+                            //    _oldscreenPointerCoords = screenPointerCoords;
+                            //    InvokeTouchActionEvent(id, TouchActionTypes.Moved, screenPointerCoords, touchSize, size, true);
+                            //}
                         }
                     }
                     break;

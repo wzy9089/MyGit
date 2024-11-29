@@ -16,9 +16,9 @@ namespace Koga.Paint
             MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Solid, 1),
         };
 
-        static readonly float MAX_SPEED = 40;
+        static readonly float MAX_SPEED = 30;
 
-        public BrushStroke() : this(new List<SKPoint>(), SKColors.Black, 10f)
+        public BrushStroke() : this(new List<SKPoint>(), SKColors.WhiteSmoke, 10f)
         {
         }
 

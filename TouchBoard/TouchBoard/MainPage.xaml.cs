@@ -2,6 +2,10 @@
 using SkiaSharp;
 using System.Diagnostics;
 
+#if ANDROID
+using TouchBoard.Platforms.Android;
+#endif
+
 namespace TouchBoard
 {
     public partial class MainPage : ContentPage
@@ -10,6 +14,13 @@ namespace TouchBoard
         public MainPage()
         {
             InitializeComponent();
+            SetFullScreen();
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            SetFullScreen();
         }
 
         private void SKCanvasView_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
@@ -55,6 +66,15 @@ namespace TouchBoard
         private void flowStroke_StrokeChanged(object sender, Koga.Paint.StrokeTypes e)
         {
             paintControl.CurrentStrokeTool = e;
+        }
+
+
+        private void SetFullScreen()
+        {
+#if ANDROID
+            var activity = Microsoft.Maui.ApplicationModel.Platform.CurrentActivity;
+            activity?.SetFullScreen();
+#endif
         }
     }
 
