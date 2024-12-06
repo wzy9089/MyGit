@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint
 {
-    public abstract class Stroke: PageElement
+    public abstract class Stroke: PaintingElement
     {
         public StrokeTypes StrokeType { get; private set; }
         public List<SKPoint> Points { get; private set; }

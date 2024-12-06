@@ -9,7 +9,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <skia:SKCanvasView x:Name="backgroundLayer" PaintSurface="backgroundLayer_PaintSurface"/>
-        <local:PageView x:Name="pageView"/>
+        <local:PaintingView x:Name="paintingView"/>
         <local:TouchPaintingView x:Name="paintView" StrokeCreated="paintView_StrokeCreated"/>
     </Grid>
 </ContentView>

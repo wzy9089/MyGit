@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint
 {
-    internal class PageView:SKCanvasView
+    internal class PaintingView:SKCanvasView
     {
         List<Stroke> _StrokeList = new List<Stroke>();
 

@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint
 {
-    public abstract class PageElement
+    public abstract class PaintingElement
     {
+        public bool IsVisible { get; set; }
         internal abstract void Draw(SKCanvas canvas, bool lastSegmentOnly);
     }
 }

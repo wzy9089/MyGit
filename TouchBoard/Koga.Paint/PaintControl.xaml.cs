@@ -6,8 +6,32 @@ public partial class PaintControl : ContentView
 {
 
     public StrokeTypes CurrentStrokeTool { get => paintView.CurrentStrokeTool; set => paintView.CurrentStrokeTool = value; }
+    public Painting Painting
+    {
+        get;
+        set
+        {
+            if (field != value)
+            {
+                if (field != null)
+                {
+                    field.PaintingChanged -= Painting_PaintingChanged;
+                }
 
-	public PaintControl()
+                field = value;
+                field.PaintingChanged += Painting_PaintingChanged;
+
+                paintingView.InvalidateSurface();
+            }
+        }
+    }
+
+    private void Painting_PaintingChanged(object? sender, PaintintChangedEventArgs e)
+    {
+        paintingView.InvalidateSurface();
+    }
+
+    public PaintControl()
 	{
 		InitializeComponent();
 	}
@@ -20,12 +44,12 @@ public partial class PaintControl : ContentView
 
     private async void paintView_StrokeCreated(object sender, StrokeCreatedEventArgs e)
     {
-        await pageView.AddStroke(e.Stroke);
+        await paintingView.AddStroke(e.Stroke);
         paintView.InvalidateSurface();
     }
 
     public void Clear()
     {
-        pageView.ClearStrokes();
+        paintingView.ClearStrokes();
     }
 }
