@@ -9,8 +9,8 @@ namespace Koga.Paint
 {
     public class HighlighterStroke : Stroke
     {
-        SKPaint _StrokePaint;
-        SKPath _TipPath;
+        SKPaint strokePaint;
+        SKPath tipPath;
 
         public HighlighterStroke() : this(new List<SKPoint>(), SKColors.Yellow, 18)
         {
@@ -22,7 +22,7 @@ namespace Koga.Paint
 
         public HighlighterStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeTypes.Highlighter, points, color, width)
         {
-            _StrokePaint = new SKPaint()
+            strokePaint = new SKPaint()
             {
                 Color = color.WithAlpha((byte)(color.Alpha/2)),
                 IsAntialias = true,
@@ -30,25 +30,25 @@ namespace Koga.Paint
                 BlendMode = SKBlendMode.Lighten,
             };
 
-            _TipPath = new SKPath();
-            _TipPath.AddOval(new SKRect(0, 0, width / 3, width));
-            var pathEffect = SKPathEffect.Create1DPath(_TipPath, 1, 0, SKPath1DPathEffectStyle.Translate);
+            tipPath = new SKPath();
+            tipPath.AddOval(new SKRect(0, 0, width / 3, width));
+            var pathEffect = SKPathEffect.Create1DPath(tipPath, 1, 0, SKPath1DPathEffectStyle.Translate);
 
-            _StrokePaint.PathEffect = pathEffect;
+            strokePaint.PathEffect = pathEffect;
         }
 
         internal override void Draw(SKCanvas canvas, bool lastSegmentOnly)
         {
             if (lastSegmentOnly)
             {
-                _StrokePaint.IsAntialias = false;
+                strokePaint.IsAntialias = false;
 
-                canvas.DrawPath(Path, _StrokePaint);
+                canvas.DrawPath(Path, strokePaint);
             }
             else
             {
-                _StrokePaint.IsAntialias = true;
-                canvas.DrawPath(Path, _StrokePaint);
+                strokePaint.IsAntialias = true;
+                canvas.DrawPath(Path, strokePaint);
             }
         }
     }

@@ -14,21 +14,21 @@ namespace Koga.Paint
         public SKColor Color { get; set; }
         public float Width { get; set; }
 
-        protected SKPath _Path = new SKPath();
+        protected SKPath path = new SKPath();
         protected virtual SKPath Path
         {
             get
             {
-                return _Path;
+                return path;
             }
         }
 
-        protected SKPath _LastPathSegment = new SKPath();
+        protected SKPath lastPathSegment = new SKPath();
         protected virtual SKPath LastPathSegment
         {
             get
             {
-                return _LastPathSegment;
+                return lastPathSegment;
             }
         }
 
@@ -86,7 +86,7 @@ namespace Koga.Paint
             LastPathSegment.Reset();
         }
 
-        SKPoint _LastCubicControl;
+        SKPoint lastCubicControl;
         internal virtual void StrokeAdd(SKPoint point, bool isNewSegment)
         {
             if(point.Equals(Points.Last()))
@@ -96,29 +96,29 @@ namespace Koga.Paint
 
             if(isNewSegment)
             {
-                _LastPathSegment.Reset();
+                lastPathSegment.Reset();
             }
 
             if (Points.Count == 3)
             {
                 var ret = StrokeBuilder.CalculateCubicControl(Points[0], Points[1], Points[2], StrokeBuilder.K);
 
-                _Path.MoveTo(Points[0]);
-                _Path.CubicTo(Points[0], ret.p1, ret.p2);
-                _LastCubicControl = ret.p3;
+                path.MoveTo(Points[0]);
+                path.CubicTo(Points[0], ret.p1, ret.p2);
+                lastCubicControl = ret.p3;
 
-                _LastPathSegment.MoveTo(Points[0]);
-                _LastPathSegment.CubicTo(Points[0], ret.p1, ret.p2);
+                lastPathSegment.MoveTo(Points[0]);
+                lastPathSegment.CubicTo(Points[0], ret.p1, ret.p2);
             }
             else if (Points.Count > 3)
             {
                 var ret = StrokeBuilder.CalculateCubicControl(Points[Points.Count - 3], Points[Points.Count - 2], Points[Points.Count - 1], StrokeBuilder.K);
  //               _Path.MoveTo(Points[Points.Count - 3]);
-                _Path.CubicTo(_LastCubicControl, ret.p1, ret.p2);
-                _LastCubicControl = ret.p3;
+                path.CubicTo(lastCubicControl, ret.p1, ret.p2);
+                lastCubicControl = ret.p3;
 
-                _LastPathSegment.MoveTo(Points[Points.Count - 3]);
-                _LastPathSegment.CubicTo(_LastCubicControl, ret.p1, ret.p2);
+                lastPathSegment.MoveTo(Points[Points.Count - 3]);
+                lastPathSegment.CubicTo(lastCubicControl, ret.p1, ret.p2);
             }
         }
 
@@ -128,25 +128,25 @@ namespace Koga.Paint
 
             if(Points.Count == 1)
             {
-                _Path.AddCircle(Points[0].X, Points[0].Y, Width / 2, SKPathDirection.Clockwise);
+                path.AddCircle(Points[0].X, Points[0].Y, Width / 2, SKPathDirection.Clockwise);
             }
             else if (Points.Count == 2)
             {
-                _Path.MoveTo(Points[0]);
-                _Path.LineTo(Points[1]);
+                path.MoveTo(Points[0]);
+                path.LineTo(Points[1]);
             }
             else
             {
                 //_Path.MoveTo(Points[Points.Count - 2]);
-                _Path.CubicTo(_LastCubicControl, Points[Points.Count - 1], Points[Points.Count - 1]);
+                path.CubicTo(lastCubicControl, Points[Points.Count - 1], Points[Points.Count - 1]);
             }
         }
 
         internal virtual void ClearPoints()
         {
             Points.Clear();
-            _Path.Reset();
-            _LastPathSegment.Reset();
+            path.Reset();
+            lastPathSegment.Reset();
         }
     }
 }

@@ -11,30 +11,38 @@ namespace Koga.Paint
 {
     internal class PaintingView:SKCanvasView
     {
-        List<Stroke> _StrokeList = new List<Stroke>();
+        SKPicture? prePicture;
 
-        bool _NeedClear = true;
-
-        public async Task AddStroke(Stroke stroke)
+        internal Painting Painting
         {
-            lock (_StrokeList)
+            get;
+            set
             {
-                _StrokeList.Add(stroke);
+                if (field != value)
+                {
+                    if (field != null)
+                    {
+                        field.PaintingChanged -= Painting_PaintingChanged;
+                    }
+
+                    field = value;
+                    field.PaintingChanged += Painting_PaintingChanged;
+
+                    InvalidateSurface();
+                }
             }
-
-            _Picture = await BuildPicture();
-
-            InvalidateSurface();
         }
 
-        public void ClearStrokes()
+        public PaintingView()
         {
-            _StrokeList.Clear();
-            _Picture = null;
-            InvalidateSurface();
+            Painting = new Painting();
         }
 
-        SKPicture? _Picture;
+        private async void Painting_PaintingChanged(object? sender, PaintintChangedEventArgs e)
+        {
+            prePicture = await BuildPicture();
+            InvalidateSurface();
+        }
 
         async Task<SKPicture> BuildPicture()
         {
@@ -44,11 +52,11 @@ namespace Koga.Paint
                 SKCanvas recordCanvas = recorder.BeginRecording(new SKRect(0, 0, CanvasSize.Width, CanvasSize.Height));
                 recordCanvas.Clear();
 
-                lock (_StrokeList)
+                lock (Painting)
                 {
-                    foreach (var stroke in _StrokeList)
+                    foreach (var element in Painting)
                     {
-                        stroke.Draw(recordCanvas, false);
+                        element.Draw(recordCanvas, false);
                     }
                 }
 
@@ -60,30 +68,14 @@ namespace Koga.Paint
         {
             var canvas = e.Surface.Canvas;
 
-            if (_Picture != null)
+            if (prePicture != null)
             {
-                canvas.DrawPicture(_Picture);
+                canvas.DrawPicture(prePicture);
             }
             else
             {
                 canvas.Clear();
             }
-
-            //if (_NeedClear)
-            //{
-            //    canvas.Clear();
-
-            //    foreach (var stroke in _StrokeList)
-            //    {
-            //        stroke.Draw(canvas, false);
-            //    }
-            //}
-            //else
-            //{
-            //    _StrokeList.Last().Draw(canvas, false);
-
-            //    _NeedClear = true;
-            //}
         }
     }
 }

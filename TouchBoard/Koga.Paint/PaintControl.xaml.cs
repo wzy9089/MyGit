@@ -5,36 +5,26 @@ namespace Koga.Paint;
 public partial class PaintControl : ContentView
 {
 
-    public StrokeTypes CurrentStrokeTool { get => paintView.CurrentStrokeTool; set => paintView.CurrentStrokeTool = value; }
-    public Painting Painting
-    {
-        get;
-        set
-        {
-            if (field != value)
-            {
-                if (field != null)
-                {
-                    field.PaintingChanged -= Painting_PaintingChanged;
-                }
+    public StrokeTypes CurrentStrokeTool { get => editView.CurrentStrokeTool; set => editView.CurrentStrokeTool = value; }
 
-                field = value;
-                field.PaintingChanged += Painting_PaintingChanged;
+    private PaintingView paintingView;
+    private TouchPaintingView editView;
 
-                paintingView.InvalidateSurface();
-            }
-        }
-    }
+    public Painting Painting { get => paintingView.Painting; set => paintingView.Painting = value; }
 
-    private void Painting_PaintingChanged(object? sender, PaintintChangedEventArgs e)
-    {
-        paintingView.InvalidateSurface();
-    }
 
     public PaintControl()
 	{
 		InitializeComponent();
-	}
+
+        paintingView = new PaintingView();
+        editView = new TouchPaintingView();
+        editView.StrokeCreated += EditView_StrokeCreated; ;
+
+        gridLayout.Add(paintingView);
+        gridLayout.Add(editView);
+
+    }
 
     private void backgroundLayer_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
     {
@@ -42,14 +32,13 @@ public partial class PaintControl : ContentView
         canvas.Clear(new SKColor(40, 55, 50));
     }
 
-    private async void paintView_StrokeCreated(object sender, StrokeCreatedEventArgs e)
+    private void EditView_StrokeCreated(object? sender, StrokeCreatedEventArgs e)
     {
-        await paintingView.AddStroke(e.Stroke);
-        paintView.InvalidateSurface();
+        Painting.Add(e.Stroke);
     }
 
     public void Clear()
     {
-        paintingView.ClearStrokes();
+        Painting.Clear();
     }
 }

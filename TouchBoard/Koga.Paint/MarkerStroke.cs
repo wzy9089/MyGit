@@ -9,7 +9,7 @@ namespace Koga.Paint
 {
     public class MarkerStroke : Stroke
     {
-        SKPaint _StrokePaint = new SKPaint()
+        SKPaint strokePaint = new SKPaint()
         {
             Style = SKPaintStyle.Stroke,
             StrokeCap = SKStrokeCap.Round,
@@ -31,17 +31,17 @@ namespace Koga.Paint
 
         internal override void Draw(SKCanvas canvas, bool lastSegmentOnly)
         {
-            _StrokePaint.Color = Color;
-            _StrokePaint.StrokeWidth = Width;
+            strokePaint.Color = Color;
+            strokePaint.StrokeWidth = Width;
 
             if (lastSegmentOnly)
             {
-                _StrokePaint.IsAntialias = false;
-                canvas.DrawPath(LastPathSegment, _StrokePaint);
+                strokePaint.IsAntialias = false;
+                canvas.DrawPath(LastPathSegment, strokePaint);
             }
             else
             {
-                canvas.DrawPath(Path, _StrokePaint);
+                canvas.DrawPath(Path, strokePaint);
             } 
         }
     }

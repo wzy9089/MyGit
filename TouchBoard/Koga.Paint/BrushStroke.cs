@@ -9,7 +9,7 @@ namespace Koga.Paint
 {
     public class BrushStroke : Stroke
     {
-        SKPaint _StrokePaint = new SKPaint()
+        SKPaint strokePaint = new SKPaint()
         {
             Style = SKPaintStyle.Fill,
             IsAntialias = true,
@@ -36,7 +36,7 @@ namespace Koga.Paint
             path.AddPath(StrokeBuilder.CreateBrushStroke(points, Width, MAX_SPEED));
         }
 
-        float _LastStrokeWidth = 1f;
+        float lastStrokeWidth = 1f;
         internal override void StrokeStart(SKPoint point)
         {
             if (Points.Count > 0)
@@ -48,7 +48,7 @@ namespace Koga.Paint
 
             Path.AddCircle(point.X, point.Y, 1f, SKPathDirection.Clockwise);
             LastPathSegment.AddCircle(point.X, point.Y, 1f, SKPathDirection.Clockwise);
-            _LastStrokeWidth = 1f;
+            lastStrokeWidth = 1f;
         }
 
         internal override void StrokeAdd(SKPoint point, bool isNewSegment)
@@ -60,7 +60,7 @@ namespace Koga.Paint
 
             if (isNewSegment)
             {
-                _LastPathSegment.Reset();
+                lastPathSegment.Reset();
             }
 
             SKPoint p0 = Points[Points.Count - 2];
@@ -68,10 +68,10 @@ namespace Koga.Paint
 
             float w = StrokeBuilder.ComputeStrokeWidthBySpeed(p0, p1, Width, MAX_SPEED);
 
-            StrokeBuilder.MakeBrushStrokeSegment(p0, _LastStrokeWidth, p1, w, _Path);
-            StrokeBuilder.MakeBrushStrokeSegment(p0, _LastStrokeWidth, p1, w, _LastPathSegment);
+            StrokeBuilder.MakeBrushStrokeSegment(p0, lastStrokeWidth, p1, w, path);
+            StrokeBuilder.MakeBrushStrokeSegment(p0, lastStrokeWidth, p1, w, lastPathSegment);
 
-            _LastStrokeWidth = w;
+            lastStrokeWidth = w;
         }
 
         internal override void StrokeEnd()
@@ -83,15 +83,15 @@ namespace Koga.Paint
 
         internal override void Draw(SKCanvas canvas, bool lastSegmentOnly)
         {
-            _StrokePaint.Color = Color;
+            strokePaint.Color = Color;
             
             if (lastSegmentOnly)
             {
-                canvas.DrawPath(LastPathSegment, _StrokePaint);
+                canvas.DrawPath(LastPathSegment, strokePaint);
             }
             else
             {
-                canvas.DrawPath(Path, _StrokePaint);
+                canvas.DrawPath(Path, strokePaint);
             }
         }
     }
