@@ -10,6 +10,11 @@ namespace Koga.Paint
     public abstract class PaintingElement
     {
         public bool IsVisible { get; set; }
+
+        internal bool IsSelected { get; set; }
+
+        public abstract bool HitTest(Point point);
+
         internal abstract void Draw(SKCanvas canvas, bool lastSegmentOnly);
     }
 }

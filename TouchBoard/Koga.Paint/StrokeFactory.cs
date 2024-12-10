@@ -8,19 +8,19 @@ namespace Koga.Paint
 {
     internal static class StrokeFactory
     {
-        public static Stroke Create(StrokeTypes strokeType)
+        public static Stroke Create(StrokeType strokeType)
         {
             switch (strokeType)
             {
-                case StrokeTypes.Marker:
+                case StrokeType.Marker:
                     return new MarkerStroke();
-                case StrokeTypes.Chalk:
+                case StrokeType.Chalk:
                     return new ChalkStroke();
-                case StrokeTypes.Brush:
+                case StrokeType.Brush:
                     return new BrushStroke();
-                case StrokeTypes.ChineseBrush:
+                case StrokeType.ChineseBrush:
                     return new BrushStroke();
-                case StrokeTypes.Highlighter:
+                case StrokeType.Highlighter:
                     return new HighlighterStroke();
                 default:
                     throw new ArgumentException("Invalid stroke type");

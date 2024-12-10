@@ -26,7 +26,7 @@ namespace Koga.Paint
         {
         }
 
-        public BrushStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeTypes.Brush, points, color, width)
+        public BrushStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeType.Brush, points, color, width)
         {
         }
 

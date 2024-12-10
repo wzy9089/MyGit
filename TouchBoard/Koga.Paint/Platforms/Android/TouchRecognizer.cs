@@ -15,26 +15,23 @@ namespace Koga.Paint.Recognizer
     public partial class TouchRecognizer
     {
         View? _view;
-        Func<double, double> fromPixels;
+        //Func<double, double> fromPixels;
         int[] twoIntArray = new int[2];
-        private Point _oldscreenPointerCoords;
 
         public partial void Initialize(Microsoft.Maui.Controls.View view)
         {
             _view = view.Handler?.PlatformView as View;
             if (_view != null)
             {
-                fromPixels = _view.Context.FromPixels;
+                //fromPixels = _view.Context.FromPixels;
                 _view.Touch += OnTouch;
             }
         }
         private void OnTouch(object? sender, View.TouchEventArgs e)
         {
             var mve = e.Event;
-            if(mve.Source != InputSourceType.Touchscreen)
-            {
+            if(mve == null)
                 return;
-            }
 
             var senderView = sender as Android.Views.View;
             var pointerIndex = mve.ActionIndex;
@@ -42,8 +39,10 @@ namespace Koga.Paint.Recognizer
 
             var screenPointerCoords = new Point(mve.GetX(pointerIndex),
                                                   mve.GetY(pointerIndex));
-            var touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
-            var size = mve.GetSize(pointerIndex);
+            
+            Size touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
+
+            float pressure = mve.GetPressure(pointerIndex);
 
             switch (mve?.ActionMasked)
             {
@@ -52,7 +51,7 @@ namespace Koga.Paint.Recognizer
                     if(senderView != null)
                         senderView.RequestPointerCapture();
 
-                    InvokeTouchActionEvent(id, TouchActionTypes.Pressed, screenPointerCoords, touchSize, size, true);
+                    InvokeTouchActionEvent(ToTouchDeviceType(mve.Source), id, TouchActionTypes.Pressed, screenPointerCoords, touchSize, pressure, true);
                     break;
 
                 case MotionEventActions.Move:
@@ -70,15 +69,17 @@ namespace Koga.Paint.Recognizer
                                 screenPointerCoords = new Point(mve.GetHistoricalX(pointerIndex, pos),
                                                                   mve.GetHistoricalY(pointerIndex, pos));
                                 touchSize = new Size(mve.GetHistoricalTouchMajor(pointerIndex, pos), mve.GetHistoricalTouchMinor(pointerIndex, pos));
+                                pressure = mve.GetHistoricalPressure(pointerIndex, pos);
                                 hisPoints.Add(new TouchPointer
                                 {
                                     PointerId = (uint)id,
                                     Position = screenPointerCoords,
-                                    Size = touchSize
+                                    Size = touchSize,
+                                    Pressure = pressure
                                 });
                             }
 
-                            TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Moved, hisPoints));
+                            TouchAction?.Invoke(this, new TouchActionEventArgs(ToTouchDeviceType(mve.Source), TouchActionTypes.Moved, hisPoints));
                         }
                     }
                     else
@@ -91,32 +92,28 @@ namespace Koga.Paint.Recognizer
                                                                   mve.GetY(pointerIndex));
 
                             touchSize = new Size(mve.GetTouchMajor(pointerIndex), mve.GetTouchMinor(pointerIndex));
+                            pressure = mve.GetPressure(pointerIndex);
 
-                            TouchAction?.Invoke(this, new TouchActionEventArgs(TouchActionTypes.Moved, new TouchPointer
+                            TouchAction?.Invoke(this, new TouchActionEventArgs(ToTouchDeviceType(mve.Source), TouchActionTypes.Moved, new TouchPointer
                             {
                                 PointerId = (uint)id,
                                 Position = screenPointerCoords,
-                                Size = touchSize
+                                Size = touchSize,
+                                Pressure = pressure
                             }));
-                            //if (_oldscreenPointerCoords == default
-                            //                            || screenPointerCoords != _oldscreenPointerCoords)
-                            //{
-                            //    _oldscreenPointerCoords = screenPointerCoords;
-                            //    InvokeTouchActionEvent(id, TouchActionTypes.Moved, screenPointerCoords, touchSize, size, true);
-                            //}
                         }
                     }
                     break;
 
                 case MotionEventActions.Up:
                 case MotionEventActions.PointerUp:
-                    InvokeTouchActionEvent(id, TouchActionTypes.Released, screenPointerCoords, touchSize, size, false);
+                    InvokeTouchActionEvent(ToTouchDeviceType(mve.Source), id, TouchActionTypes.Released, screenPointerCoords, touchSize, pressure, false);
 
                     if(senderView != null)
                         senderView.ReleasePointerCapture();
                     break;
                 case MotionEventActions.Cancel:
-                    InvokeTouchActionEvent(id, TouchActionTypes.Cancelled, screenPointerCoords, touchSize, size, false);
+                    InvokeTouchActionEvent(ToTouchDeviceType(mve.Source), id, TouchActionTypes.Cancelled, screenPointerCoords, touchSize, pressure, false);
 
                     if (senderView != null)
                         senderView.ReleasePointerCapture();
@@ -126,23 +123,31 @@ namespace Koga.Paint.Recognizer
             e.Handled=true;
         }
 
-        void InvokeTouchActionEvent(int id, TouchActionTypes actionType, Point pointerLocation,Size pointerSize, float size, bool isInContact)
+        void InvokeTouchActionEvent(TouchDeviceType deviceType, int id, TouchActionTypes actionType, Point pointerLocation,Size pointerSize, float pressure, bool isInContact)
         {
-            //_view.GetLocationOnScreen(twoIntArray);
-            //double x = pointerLocation.X - twoIntArray[0];
-            //double y = pointerLocation.Y - twoIntArray[1];
-            //Point point = new Point(fromPixels(x), fromPixels(y));
             TouchPointer touchPointer = new TouchPointer
             {
                 PointerId = (uint)id,
                 Position = pointerLocation,
-                Size = pointerSize
+                Size = pointerSize,
+                Pressure = pressure
             };
 
-            Debug.WriteLine($"{id},{actionType},{pointerLocation},{pointerSize},{size}");
-            TouchAction?.Invoke(this, new TouchActionEventArgs(actionType,touchPointer));
+            Debug.WriteLine($"{id},{actionType},{pointerLocation},{pointerSize},{pressure}");
+            TouchAction?.Invoke(this, new TouchActionEventArgs(deviceType, actionType,touchPointer));
         }
 
+        private TouchDeviceType ToTouchDeviceType(InputSourceType sourceType)
+        {
+            return sourceType switch
+            {
+                InputSourceType.Mouse => TouchDeviceType.Mouse,
+                InputSourceType.Stylus => TouchDeviceType.Pen,
+                InputSourceType.Touchscreen => TouchDeviceType.Touch,
+                InputSourceType.Touchpad => TouchDeviceType.TouchPad,
+                _ => TouchDeviceType.Unknown
+            };
+        }
 
         public partial void Dispose()
         { 

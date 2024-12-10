@@ -9,7 +9,7 @@ namespace Koga.Paint
 {
     public abstract class Stroke: PaintingElement
     {
-        public StrokeTypes StrokeType { get; private set; }
+        public StrokeType StrokeType { get; private set; }
         public List<SKPoint> Points { get; private set; }
         public SKColor Color { get; set; }
         public float Width { get; set; }
@@ -32,7 +32,7 @@ namespace Koga.Paint
             }
         }
 
-        protected Stroke(StrokeTypes strokeType, List<SKPoint> points, SKColor color, float width)
+        protected Stroke(StrokeType strokeType, List<SKPoint> points, SKColor color, float width)
         {
             StrokeType = strokeType;
             Color = color;
@@ -147,6 +147,14 @@ namespace Koga.Paint
             Points.Clear();
             path.Reset();
             lastPathSegment.Reset();
+        }
+
+        public override bool HitTest(Point point)
+        {
+            if(Path.IsEmpty)
+                return false;
+
+            return Path.Contains((float)point.X, (float)point.Y);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint
 {
-    public enum StrokeTypes
+    public enum StrokeType
     {
         Marker,
         Chalk,

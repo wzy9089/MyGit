@@ -20,7 +20,7 @@ namespace Koga.Paint
         {
         }
 
-        public HighlighterStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeTypes.Highlighter, points, color, width)
+        public HighlighterStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeType.Highlighter, points, color, width)
         {
             strokePaint = new SKPaint()
             {

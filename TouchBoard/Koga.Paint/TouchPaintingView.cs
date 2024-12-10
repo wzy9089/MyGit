@@ -19,12 +19,12 @@ namespace Koga.Paint
 
         private bool _NeedClear = true;
 
-        public StrokeTypes CurrentStrokeTool
+        public StrokeType CurrentStrokeTool
         { get;  set; }
 
         public TouchPaintingView()
         {
-            CurrentStrokeTool = StrokeTypes.Highlighter;
+            CurrentStrokeTool = StrokeType.Highlighter;
             //this.PaintSurface += TouchPaintingView_PaintSurface;
         }
 
@@ -52,7 +52,7 @@ namespace Koga.Paint
                             _Strokes[e.Pointer.PointerId].StrokeAdd(ToDipPoint(pointer.Position), false);
                         }
 
-                        _NeedClear = CurrentStrokeTool == StrokeTypes.Highlighter ? true : false;
+                        _NeedClear = CurrentStrokeTool == StrokeType.Highlighter ? true : false;
                         InvalidateSurface();
                     }
                     break;

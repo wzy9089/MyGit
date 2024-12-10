@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint.Recognizer
 {
-    public struct TouchPointer
+    public enum TouchDeviceType
     {
-        public uint PointerId;
-        public Point Position;
-        public Size  Size;
-        public double Pressure;
+        Touch,
+        Pen,
+        Mouse,
+        TouchPad,
+        Unknown
     }
 }

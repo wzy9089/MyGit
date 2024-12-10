@@ -5,7 +5,7 @@ namespace Koga.Paint;
 public partial class PaintControl : ContentView
 {
 
-    public StrokeTypes CurrentStrokeTool { get => editView.CurrentStrokeTool; set => editView.CurrentStrokeTool = value; }
+    public StrokeType CurrentStrokeTool { get => editView.CurrentStrokeTool; set => editView.CurrentStrokeTool = value; }
 
     private PaintingView paintingView;
     private TouchPaintingView editView;

@@ -53,7 +53,7 @@ namespace TouchBoard
                     {
                         if (e.PropertyName == "Selection")
                         {
-                            paintControl.CurrentStrokeTool = (Koga.Paint.StrokeTypes)ssp.ViewModel.Selection;
+                            paintControl.CurrentStrokeTool = (Koga.Paint.StrokeType)ssp.ViewModel.Selection;
                         }
                     };
                     ssp.Anchor = button;
@@ -63,7 +63,7 @@ namespace TouchBoard
 
         }
 
-        private void flowStroke_StrokeChanged(object sender, Koga.Paint.StrokeTypes e)
+        private void flowStroke_StrokeChanged(object sender, Koga.Paint.StrokeType e)
         {
             paintControl.CurrentStrokeTool = e;
         }

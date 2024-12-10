@@ -25,7 +25,7 @@ namespace Koga.Paint
         {
         }
 
-        public MarkerStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeTypes.Marker, points, color, width)
+        public MarkerStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeType.Marker, points, color, width)
         {
         }
 

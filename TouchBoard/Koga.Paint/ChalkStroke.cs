@@ -22,7 +22,7 @@ namespace Koga.Paint
         {
         }
 
-        public ChalkStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeTypes.Chalk, points, color, width)
+        public ChalkStroke(List<SKPoint> points, SKColor color, float width) : base(StrokeType.Chalk, points, color, width)
         {
             strokePaint = new SKPaint()
             {
