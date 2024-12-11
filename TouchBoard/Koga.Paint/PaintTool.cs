@@ -8,28 +8,28 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint
 {
-    internal abstract class PaintTool
+    public abstract class PaintTool
     {
-        internal abstract Uri ToolID { get; }
+        public abstract string ToolID { get; }
 
         internal event EventHandler<PaintToolEventArgs>? PaintStarted;
         internal event EventHandler<PaintToolEventArgs>? PaintFinished;
 
-        internal Dictionary<string, object> Parameters { get; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Parameters { get; } = new Dictionary<string, object>();
 
-        protected IPaintControl Owner { get; private set; }
+        internal IPaintControl Owner { get; private set; }
 
         internal PaintTool(IPaintControl owner)
         {
             Owner = owner;
         }
 
-        protected virtual void OnPaintStarted(PaintToolEventArgs args)
+        internal virtual void OnPaintStarted(PaintToolEventArgs args)
         {
             PaintStarted?.Invoke(this, args);
         }
 
-        protected virtual void OnPaintFinished(PaintToolEventArgs args)
+        internal virtual void OnPaintFinished(PaintToolEventArgs args)
         {
             PaintFinished?.Invoke(this, args);
         }

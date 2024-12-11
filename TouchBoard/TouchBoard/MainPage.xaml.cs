@@ -48,12 +48,13 @@ namespace TouchBoard
                 if(button.CommandParameter.Equals("笔"))
                 {
                     StrokeSettingsPopup ssp = new StrokeSettingsPopup();
-                    ssp.ViewModel.Selection = (int)paintControl.CurrentStrokeTool;
+                    paintControl.PaintToolManager.SetCurrentTool("Koga.PaintTool.StrokePaintTool");
+                    ssp.ViewModel.Selection = (int)paintControl.PaintToolManager.CurrentTool.Parameters["StrokeType"];
                     ssp.ViewModel.PropertyChanged += (s, e) =>
                     {
                         if (e.PropertyName == "Selection")
                         {
-                            paintControl.CurrentStrokeTool = (Koga.Paint.StrokeType)ssp.ViewModel.Selection;
+                            paintControl.PaintToolManager.CurrentTool.Parameters["StrokeType"] = (Koga.Paint.StrokeType)ssp.ViewModel.Selection;
                         }
                     };
                     ssp.Anchor = button;
@@ -65,7 +66,7 @@ namespace TouchBoard
 
         private void flowStroke_StrokeChanged(object sender, Koga.Paint.StrokeType e)
         {
-            paintControl.CurrentStrokeTool = e;
+            paintControl.PaintToolManager.CurrentTool.Parameters["StrokeType"] = e;
         }
 
 

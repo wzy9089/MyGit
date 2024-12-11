@@ -1,14 +1,18 @@
 using SkiaSharp;
+using Koga.Paint.Recognizer;
 
 namespace Koga.Paint;
 
-public partial class PaintControl : ContentView
+public partial class PaintControl : ContentView,IPaintControl
 {
 
-    public StrokeType CurrentStrokeTool { get => editView.CurrentStrokeTool; set => editView.CurrentStrokeTool = value; }
+    //public StrokeType CurrentStrokeTool { get => paintToolView.CurrentStrokeTool; set => paintToolView.CurrentStrokeTool = value; }
 
     private PaintingView paintingView;
-    private TouchPaintingView editView;
+    private PaintToolView paintToolView;
+    //private PaintToolManager paintToolManager;
+
+    public PaintToolManager PaintToolManager { get; private set; }
 
     public Painting Painting { get => paintingView.Painting; set => paintingView.Painting = value; }
 
@@ -18,12 +22,20 @@ public partial class PaintControl : ContentView
 		InitializeComponent();
 
         paintingView = new PaintingView();
-        editView = new TouchPaintingView();
-        editView.StrokeCreated += EditView_StrokeCreated; ;
+        paintToolView = new PaintToolView();
 
         gridLayout.Add(paintingView);
-        gridLayout.Add(editView);
+        gridLayout.Add(paintToolView);
 
+        PaintToolManager = new PaintToolManager(this);
+        PaintToolManager.CurrentToolChanged += PaintToolManager_CurrentToolChanged;
+
+        paintToolView.PaintTool = PaintToolManager.CurrentTool;
+    }
+
+    private void PaintToolManager_CurrentToolChanged(object? sender, EventArgs e)
+    {
+        paintToolView.PaintTool = PaintToolManager.CurrentTool;
     }
 
     private void backgroundLayer_PaintSurface(object sender, SkiaSharp.Views.Maui.SKPaintSurfaceEventArgs e)
@@ -32,13 +44,27 @@ public partial class PaintControl : ContentView
         canvas.Clear(new SKColor(40, 55, 50));
     }
 
-    private void EditView_StrokeCreated(object? sender, StrokeCreatedEventArgs e)
-    {
-        Painting.Add(e.Stroke);
-    }
-
     public void Clear()
     {
         Painting.Clear();
+    }
+
+    public void UpdateRealtimeView()
+    {
+        paintToolView.InvalidateSurface();
+    }
+
+    public void UpdatePaintingView()
+    {
+        paintingView.InvalidateSurface();
+    }
+
+    void IPaintControl.OnPaintStarted(object? sender, PaintToolEventArgs args)
+    {
+    }
+
+    void IPaintControl.OnPaintFinished(object? sender, PaintToolEventArgs args)
+    {
+        Painting.Add(args.NewElement);
     }
 }

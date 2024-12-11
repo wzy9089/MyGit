@@ -13,10 +13,13 @@ namespace Koga.Paint
     {
         private Dictionary<uint, Stroke> strokes = new Dictionary<uint, Stroke>();
 
-        internal override Uri ToolID => new Uri("Koga://PaintTool/StrokePaintTool");
+        public override string ToolID => "Koga.PaintTool.StrokePaintTool";
 
-        internal StrokePaintTool(IPaintControl control) : base(control)
+        public StrokePaintTool(IPaintControl control) : base(control)
         {
+            Parameters["StrokeType"] = StrokeType.Marker;
+            Parameters["StrokeWidth"] = 5;
+            Parameters["StrokeColor"] = SKColors.Black;
         }
 
         internal override void TouchActionUpdate(TouchActionEventArgs e)

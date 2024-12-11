@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace Koga.Paint
 {
-    public interface IPaintControl
+    internal interface IPaintControl
     {
         public Painting Painting { get;set; }
-        internal void UpdateRealtimeView();
-        internal void UpdatePaintingView();
+        public void UpdateRealtimeView();
+        public void UpdatePaintingView();
+
+        public void OnPaintStarted(object? sender, PaintToolEventArgs args);
+
+        public void OnPaintFinished(object? sender, PaintToolEventArgs args);
     }
 }
